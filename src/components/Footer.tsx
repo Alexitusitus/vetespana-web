@@ -29,7 +29,7 @@ export default function Footer() {
             <h4 className="text-white font-semibold mb-3">Para clínicas</h4>
             <ul className="space-y-2 text-sm">
               <li><Link href="/alta-clinica" className="hover:text-white transition-colors">Añadir mi clínica</Link></li>
-              <li><Link href="/premium" className="hover:text-white transition-colors">Ficha Premium — 19€/mes</Link></li>
+              <li><Link href="/premium" className="hover:text-white transition-colors">Ficha Premium — 1,99€/mes</Link></li>
             </ul>
           </div>
         </div>

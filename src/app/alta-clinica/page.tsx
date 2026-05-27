@@ -57,7 +57,7 @@ export default function AltaClinicaPage() {
           </div>
           <div className="font-bold text-xl mb-1">Ficha Premium</div>
           <div className="text-3xl font-bold mb-1">
-            19€<span className="text-base font-normal text-teal-200">/mes</span>
+            1,99€<span className="text-base font-normal text-teal-200">/mes</span>
           </div>
           <p className="text-teal-200 text-xs mb-4">Cancela cuando quieras</p>
           <ul className="space-y-2 text-sm mb-6">

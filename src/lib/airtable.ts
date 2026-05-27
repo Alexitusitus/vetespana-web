@@ -56,7 +56,9 @@ function recordToClinic(record: any): Clinic {
 // Guard: si no hay API key configurada, devuelve array vacío en vez de error 500
 function isConfigured(): boolean {
   const key = process.env.AIRTABLE_API_KEY
-  return Boolean(key && key !== 'tu_token_aqui' && key.length > 10)
+  const configured = Boolean(key && key !== 'tu_token_aqui' && key.length > 10)
+  console.log('[airtable] isConfigured:', configured, '| key length:', key?.length ?? 0, '| baseId:', process.env.AIRTABLE_BASE_ID)
+  return configured
 }
 
 export async function getClinics(options?: {
@@ -66,11 +68,11 @@ export async function getClinics(options?: {
   onlyPremium?: boolean
   limit?: number
 }): Promise<Clinic[]> {
-  if (!isConfigured()) return []
+  if (!isConfigured()) {
+    console.log('[airtable] getClinics: not configured, returning []')
+    return []
+  }
   const filterParts: string[] = []
-
-  // Solo clínicas verificadas en la web pública
-  filterParts.push(`{Verificada} = TRUE()`)
 
   if (options?.ciudad) {
     filterParts.push(`{Ciudad} = "${options.ciudad}"`)
@@ -88,11 +90,13 @@ export async function getClinics(options?: {
   const filterFormula =
     filterParts.length > 1
       ? `AND(${filterParts.join(', ')})`
-      : filterParts[0]
+      : filterParts.length === 1
+      ? filterParts[0]
+      : undefined
 
   const records = await base('Clínicas')
     .select({
-      filterByFormula: filterFormula,
+      ...(filterFormula ? { filterByFormula: filterFormula } : {}),
       sort: [
         { field: 'Plan', direction: 'desc' }, // Premium primero
         { field: 'Valoración media', direction: 'desc' },
@@ -101,6 +105,7 @@ export async function getClinics(options?: {
     })
     .all()
 
+  console.log('[airtable] getClinics: got', records.length, 'records')
   return records.map(recordToClinic)
 }
 
@@ -108,7 +113,7 @@ export async function getClinicBySlug(slug: string): Promise<Clinic | null> {
   if (!isConfigured()) return null
   // Traemos todas y filtramos por slug (Airtable no tiene búsqueda por slug nativa)
   const records = await base('Clínicas')
-    .select({ filterByFormula: `{Verificada} = TRUE()` })
+    .select({})
     .all()
 
   const match = records.find((r) => toSlug(r.fields['Nombre'] as string) === slug)
@@ -118,10 +123,7 @@ export async function getClinicBySlug(slug: string): Promise<Clinic | null> {
 export async function getAllClinicSlugs(): Promise<string[]> {
   if (!isConfigured()) return []
   const records = await base('Clínicas')
-    .select({
-      filterByFormula: `{Verificada} = TRUE()`,
-      fields: ['Nombre'],
-    })
+    .select({ fields: ['Nombre'] })
     .all()
   return records.map((r) => toSlug(r.fields['Nombre'] as string))
 }

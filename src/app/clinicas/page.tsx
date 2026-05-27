@@ -5,7 +5,7 @@ import ClinicCard from '@/components/ClinicCard'
 import FilterBar from '@/components/FilterBar'
 import SearchBar from '@/components/SearchBar'
 
-export const revalidate = 300 // Refresca los datos cada 5 minutos
+export const dynamic = 'force-dynamic' // SSR real en cada petición — datos siempre frescos de Airtable
 
 interface Props {
   searchParams: Promise<{

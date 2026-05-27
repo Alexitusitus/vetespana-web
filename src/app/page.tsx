@@ -5,7 +5,7 @@ import ClinicCard from '@/components/ClinicCard'
 import SearchBar from '@/components/SearchBar'
 import { ArrowRight, ShieldCheck, Star, Zap } from 'lucide-react'
 
-export const revalidate = 300 // Refresca los datos cada 5 minutos
+export const dynamic = 'force-dynamic' // SSR real en cada petición — datos siempre frescos de Airtable
 
 export default async function HomePage() {
   const clinicas = await getFeaturedClinics()

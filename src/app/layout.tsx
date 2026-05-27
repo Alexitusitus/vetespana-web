@@ -25,6 +25,9 @@ export const metadata: Metadata = {
     locale: 'es_ES',
     siteName: 'VetEspaña',
   },
+  verification: {
+    google: '6nCvZZXDFshsAsAl-yHK3T2iDNj70NB7OubJ06VMR-Q',
+  },
 }
 
 export default function RootLayout({

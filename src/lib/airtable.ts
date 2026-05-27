@@ -56,9 +56,7 @@ function recordToClinic(record: any): Clinic {
 // Guard: si no hay API key configurada, devuelve array vacío en vez de error 500
 function isConfigured(): boolean {
   const key = process.env.AIRTABLE_API_KEY
-  const configured = Boolean(key && key !== 'tu_token_aqui' && key.length > 10)
-  console.log('[airtable] isConfigured:', configured, '| key length:', key?.length ?? 0, '| baseId:', process.env.AIRTABLE_BASE_ID)
-  return configured
+  return Boolean(key && key !== 'tu_token_aqui' && key.length > 10)
 }
 
 export async function getClinics(options?: {
@@ -68,10 +66,7 @@ export async function getClinics(options?: {
   onlyPremium?: boolean
   limit?: number
 }): Promise<Clinic[]> {
-  if (!isConfigured()) {
-    console.log('[airtable] getClinics: not configured, returning []')
-    return []
-  }
+  if (!isConfigured()) return []
   const filterParts: string[] = []
 
   if (options?.ciudad) {
@@ -105,7 +100,6 @@ export async function getClinics(options?: {
     })
     .all()
 
-  console.log('[airtable] getClinics: got', records.length, 'records')
   return records.map(recordToClinic)
 }
 

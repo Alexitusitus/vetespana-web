@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+/* Forzamos light mode siempre — plataforma de clínicas, no necesita dark mode */
+:root {
+  color-scheme: light;
+}
+
+body {
+  background-color: #f9fafb; /* gray-50 */
+  color: #111827; /* gray-900 */
+}

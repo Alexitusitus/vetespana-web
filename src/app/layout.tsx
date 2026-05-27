@@ -1,0 +1,44 @@
+import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
+import './globals.css'
+import Header from '@/components/Header'
+import Footer from '@/components/Footer'
+
+const inter = Inter({ subsets: ['latin'] })
+
+export const metadata: Metadata = {
+  title: {
+    default: 'VetEspaña — Encuentra tu veterinario de confianza en España',
+    template: '%s | VetEspaña',
+  },
+  description:
+    'Directorio de clínicas veterinarias en España. Encuentra veterinarios por ciudad, especialidad y urgencias 24h. Fichas completas con fotos, horarios y reseñas.',
+  keywords: [
+    'veterinaria',
+    'clínica veterinaria',
+    'veterinario España',
+    'urgencias veterinarias',
+    'veterinario cerca',
+  ],
+  openGraph: {
+    type: 'website',
+    locale: 'es_ES',
+    siteName: 'VetEspaña',
+  },
+}
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="es">
+      <body className={`${inter.className} bg-gray-50 text-gray-900`}>
+        <Header />
+        <main>{children}</main>
+        <Footer />
+      </body>
+    </html>
+  )
+}

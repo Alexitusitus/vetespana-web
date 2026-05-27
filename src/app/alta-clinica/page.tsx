@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     'Registra tu clínica veterinaria en VetEspaña gratis. Llega a miles de dueños de mascotas que buscan veterinario en tu ciudad.',
 }
 
-const TALLY_URL = 'https://tally.so/r/XXXXXXX' // ← sustituir con la URL real de tu formulario Tally
+const TALLY_URL = 'https://tally.so/r/PdGVPe'
 
 export default function AltaClinicaPage() {
   return (

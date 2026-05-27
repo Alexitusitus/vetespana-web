@@ -20,8 +20,7 @@ export default async function HomePage() {
             veterinaria cerca de ti
           </h1>
           <p className="text-teal-100 text-lg mb-8">
-            Más de {clinicas.length > 0 ? `${clinicas.length}+` : 'cientos de'} clínicas veterinarias
-            verificadas en toda España. Con fotos, horarios, especialidades y reseñas reales.
+            Más de 30 clínicas veterinarias verificadas en toda España. Con fotos, horarios, especialidades y reseñas reales.
           </p>
 
           <div className="bg-white rounded-2xl p-3 shadow-2xl">

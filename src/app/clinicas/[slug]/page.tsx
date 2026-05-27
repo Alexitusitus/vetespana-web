@@ -8,6 +8,8 @@ import {
 } from 'lucide-react'
 import { getClinicBySlug, getAllClinicSlugs, getReviewsByClinic } from '@/lib/airtable'
 
+export const revalidate = 300 // Refresca los datos cada 5 minutos
+
 interface Props {
   params: Promise<{ slug: string }>
 }

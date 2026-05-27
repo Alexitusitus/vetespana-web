@@ -5,6 +5,8 @@ import ClinicCard from '@/components/ClinicCard'
 import FilterBar from '@/components/FilterBar'
 import SearchBar from '@/components/SearchBar'
 
+export const revalidate = 300 // Refresca los datos cada 5 minutos
+
 interface Props {
   searchParams: Promise<{
     ciudad?: string

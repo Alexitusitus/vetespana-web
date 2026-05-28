@@ -126,7 +126,6 @@ export default async function HomePage() {
           >
             Añadir mi clínica — es gratis <ArrowRight size={16} />
           </Link>
-          <p className="text-xs text-gray-400 mt-3">Ficha básica gratuita · Ficha Premium desde 1,99€/mes</p>
         </div>
       </section>
     </>

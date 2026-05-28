@@ -101,7 +101,8 @@ export async function getClinics(options?: {
     .select({
       ...(filterFormula ? { filterByFormula: filterFormula } : {}),
       sort: [
-        { field: 'Plan', direction: 'desc' }, // Premium primero
+        { field: 'Plan', direction: 'desc' },       // Premium primero
+        { field: 'Verificada', direction: 'desc' },  // Verificadas después
         { field: 'Valoración media', direction: 'desc' },
       ],
       maxRecords: options?.limit ?? 2000,

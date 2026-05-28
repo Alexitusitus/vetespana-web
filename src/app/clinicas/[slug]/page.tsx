@@ -7,6 +7,7 @@ import {
   Star, Zap, ArrowLeft, MessageCircle
 } from 'lucide-react'
 import { getClinicBySlug, getAllClinicSlugs, getReviewsByClinic } from '@/lib/airtable'
+import ReviewForm from '@/components/ReviewForm'
 
 export const dynamic = 'force-dynamic' // SSR real en cada petición — datos siempre frescos de Airtable
 
@@ -224,6 +225,8 @@ export default async function ClinicaPage({ params }: Props) {
               ) : (
                 <p className="text-sm text-gray-400">Todavía no hay reseñas para esta clínica. ¡Sé el primero en opinar!</p>
               )}
+
+              <ReviewForm clinicId={clinic.id} clinicNombre={clinic.nombre} />
             </div>
           </div>
 

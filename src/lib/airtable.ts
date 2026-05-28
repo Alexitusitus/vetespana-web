@@ -1,5 +1,6 @@
 import Airtable from 'airtable'
 import type { Clinic, Review, ClinicPhoto } from '@/types/clinic'
+import { CIUDADES_POR_COMUNIDAD } from '@/types/clinic'
 
 const base = new Airtable({
   apiKey: process.env.AIRTABLE_API_KEY,
@@ -61,6 +62,7 @@ function isConfigured(): boolean {
 
 export async function getClinics(options?: {
   ciudad?: string
+  comunidad?: string
   especialidad?: string
   urgencias?: boolean
   onlyPremium?: boolean
@@ -71,6 +73,12 @@ export async function getClinics(options?: {
 
   if (options?.ciudad) {
     filterParts.push(`{Ciudad} = "${options.ciudad}"`)
+  } else if (options?.comunidad) {
+    const ciudades = CIUDADES_POR_COMUNIDAD[options.comunidad] ?? []
+    if (ciudades.length > 0) {
+      const orParts = ciudades.map((c) => `{Ciudad} = "${c}"`).join(', ')
+      filterParts.push(`OR(${orParts})`)
+    }
   }
   if (options?.especialidad) {
     filterParts.push(`FIND("${options.especialidad}", ARRAYJOIN({Especialidades})) > 0`)

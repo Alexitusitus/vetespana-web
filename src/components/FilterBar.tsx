@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter, useSearchParams } from 'next/navigation'
-import { ESPECIALIDADES, CIUDADES, CIUDAD_DISPLAY } from '@/types/clinic'
+import { ESPECIALIDADES, CIUDADES_POR_COMUNIDAD, CIUDAD_DISPLAY } from '@/types/clinic'
 import { SlidersHorizontal, X } from 'lucide-react'
 
 export default function FilterBar() {
@@ -9,11 +9,12 @@ export default function FilterBar() {
   const searchParams = useSearchParams()
 
   const ciudad = searchParams.get('ciudad') ?? ''
+  const comunidad = searchParams.get('comunidad') ?? ''
   const especialidad = searchParams.get('especialidad') ?? ''
   const urgencias = searchParams.get('urgencias') === '1'
   const orden = searchParams.get('orden') ?? 'relevancia'
 
-  const hayFiltrosActivos = ciudad || especialidad || urgencias
+  const hayFiltrosActivos = ciudad || comunidad || especialidad || urgencias
 
   function update(key: string, value: string | null) {
     const params = new URLSearchParams(searchParams.toString())
@@ -22,6 +23,9 @@ export default function FilterBar() {
     } else {
       params.set(key, value)
     }
+    // ciudad y comunidad son mutuamente excluyentes
+    if (key === 'ciudad' && value) params.delete('comunidad')
+    if (key === 'comunidad' && value) params.delete('ciudad')
     router.push(`/clinicas?${params.toString()}`)
   }
 
@@ -41,15 +45,19 @@ export default function FilterBar() {
           Filtros
         </div>
 
-        {/* Ciudad */}
+        {/* Ciudad agrupada por comunidad */}
         <select
           value={ciudad}
           onChange={(e) => update('ciudad', e.target.value)}
           className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-400 bg-white cursor-pointer"
         >
-          <option value="">Todas las ciudades</option>
-          {CIUDADES.map((c) => (
-            <option key={c} value={c}>{CIUDAD_DISPLAY[c] ?? c}</option>
+          <option value="">{comunidad ? `Todas en ${comunidad}` : 'Todas las ciudades'}</option>
+          {Object.entries(CIUDADES_POR_COMUNIDAD).map(([com, ciudades]) => (
+            <optgroup key={com} label={com}>
+              {ciudades.map((c) => (
+                <option key={c} value={c}>{CIUDAD_DISPLAY[c] ?? c}</option>
+              ))}
+            </optgroup>
           ))}
         </select>
 
@@ -92,6 +100,16 @@ export default function FilterBar() {
       {hayFiltrosActivos && (
         <div className="flex flex-wrap gap-2 items-center">
           <span className="text-xs text-gray-500">Filtrando por:</span>
+
+          {comunidad && (
+            <button
+              onClick={() => update('comunidad', null)}
+              className="inline-flex items-center gap-1.5 bg-teal-50 text-teal-700 border border-teal-200 text-xs font-medium px-3 py-1 rounded-full hover:bg-teal-100 transition-colors"
+            >
+              🗺️ {comunidad}
+              <X size={12} />
+            </button>
+          )}
 
           {ciudad && (
             <button

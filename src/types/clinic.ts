@@ -54,6 +54,48 @@ export const ESPECIALIDADES = [
   'Hospitalización',
 ] as const
 
+export const CIUDADES_POR_COMUNIDAD: Record<string, string[]> = {
+  'Andalucía':            ['Almería', 'Cádiz', 'Córdoba', 'Granada', 'Huelva', 'Jerez de la Frontera', 'Málaga', 'Marbella', 'Sevilla'],
+  'Aragón':               ['Zaragoza'],
+  'Asturias':             ['Oviedo'],
+  'Canarias':             ['Las Palmas', 'Santa Cruz de Tenerife'],
+  'Cantabria':            ['Santander'],
+  'Castilla y León':      ['Burgos', 'Salamanca', 'Valladolid'],
+  'Castilla-La Mancha':   ['Albacete', 'Toledo'],
+  'Cataluña':             ['Barcelona', 'Girona', 'Lleida', 'Tarragona'],
+  'Comunidad de Madrid':  ['Madrid'],
+  'C. Valenciana':        ['Alicante', 'Castellón', 'Elche', 'Valencia'],
+  'Extremadura':          ['Badajoz'],
+  'Galicia':              ['A Coruña', 'Vigo'],
+  'Islas Baleares':       ['Palma'],
+  'La Rioja':             ['Logrono'],
+  'Región de Murcia':     ['Cartagena', 'Murcia'],
+  'Navarra':              ['Pamplona'],
+  'País Vasco':           ['Bilbao', 'San Sebastián', 'Vitoria'],
+}
+
+export const COMUNIDADES = Object.keys(CIUDADES_POR_COMUNIDAD)
+
+export const COMUNIDAD_EMOJI: Record<string, string> = {
+  'Andalucía':            '🌞',
+  'Aragón':               '🏔️',
+  'Asturias':             '🌿',
+  'Canarias':             '🌴',
+  'Cantabria':            '🌊',
+  'Castilla y León':      '🏰',
+  'Castilla-La Mancha':   '🌾',
+  'Cataluña':             '🔴',
+  'Comunidad de Madrid':  '🏙️',
+  'C. Valenciana':        '🍊',
+  'Extremadura':          '🦅',
+  'Galicia':              '🌧️',
+  'Islas Baleares':       '⛵',
+  'La Rioja':             '🍷',
+  'Región de Murcia':     '☀️',
+  'Navarra':              '🏃',
+  'País Vasco':           '🐟',
+}
+
 export const CIUDADES = [
   'A Coruña',
   'Albacete',

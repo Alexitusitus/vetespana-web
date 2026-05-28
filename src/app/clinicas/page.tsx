@@ -10,6 +10,7 @@ export const dynamic = 'force-dynamic' // SSR real en cada petición — datos s
 interface Props {
   searchParams: Promise<{
     ciudad?: string
+    comunidad?: string
     especialidad?: string
     urgencias?: string
     q?: string
@@ -20,7 +21,8 @@ interface Props {
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const params = await searchParams
   const parts: string[] = []
-  if (params.ciudad) parts.push(`en ${params.ciudad}`)
+  if (params.comunidad) parts.push(`en ${params.comunidad}`)
+  else if (params.ciudad) parts.push(`en ${params.ciudad}`)
   if (params.especialidad) parts.push(params.especialidad.toLowerCase())
   if (params.urgencias === '1') parts.push('urgencias 24h')
 
@@ -28,9 +30,10 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     ? `Clínicas veterinarias ${parts.join(' · ')}`
     : 'Todas las clínicas veterinarias en España'
 
+  const lugar = params.comunidad ?? params.ciudad ?? 'España'
   return {
     title,
-    description: `Directorio de clínicas veterinarias${params.ciudad ? ` en ${params.ciudad}` : ' en España'}. Filtra por especialidad, urgencias y valoración.`,
+    description: `Directorio de clínicas veterinarias en ${lugar}. Filtra por especialidad, urgencias y valoración.`,
   }
 }
 
@@ -39,6 +42,7 @@ export default async function ClinicasPage({ searchParams }: Props) {
 
   const clinicas = await getClinics({
     ciudad: params.ciudad,
+    comunidad: params.comunidad,
     especialidad: params.especialidad,
     urgencias: params.urgencias === '1',
   })
@@ -63,10 +67,11 @@ export default async function ClinicasPage({ searchParams }: Props) {
     filtradas.sort((a, b) => (b.valoracionMedia ?? 0) - (a.valoracionMedia ?? 0))
   }
 
+  const lugar = params.ciudad ?? params.comunidad ?? 'España'
   const tituloH1 = [
     'Clínicas veterinarias',
     params.especialidad ? `· ${params.especialidad}` : '',
-    params.ciudad ? `en ${params.ciudad}` : 'en España',
+    `en ${lugar}`,
   ]
     .filter(Boolean)
     .join(' ')

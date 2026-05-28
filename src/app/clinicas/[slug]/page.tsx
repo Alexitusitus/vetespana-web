@@ -39,6 +39,29 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
+const GRADIENTS = [
+  'from-teal-400 to-cyan-600',
+  'from-emerald-400 to-teal-600',
+  'from-cyan-400 to-blue-600',
+  'from-teal-500 to-emerald-700',
+  'from-blue-400 to-teal-600',
+  'from-green-400 to-emerald-600',
+]
+
+function PagePlaceholder({ nombre, ciudad }: { nombre: string; ciudad: string }) {
+  const idx = nombre.charCodeAt(0) % GRADIENTS.length
+  const gradient = GRADIENTS[idx]
+  const inicial = nombre.charAt(0).toUpperCase()
+  return (
+    <div className={`w-full h-full flex flex-col items-center justify-center bg-gradient-to-br ${gradient} gap-3`}>
+      <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-4xl shadow-inner">
+        {inicial}
+      </div>
+      <span className="text-white/80 text-sm font-medium tracking-widest uppercase">{ciudad}</span>
+    </div>
+  )
+}
+
 function StarRating({ rating }: { rating: number }) {
   return (
     <div className="flex items-center gap-0.5">
@@ -109,8 +132,8 @@ export default async function ClinicaPage({ params }: Props) {
           {/* Columna principal */}
           <div className="lg:col-span-2 space-y-6">
             {/* Foto portada */}
-            {clinic.fotoPortada && (
-              <div className="relative h-64 md:h-80 rounded-2xl overflow-hidden">
+            <div className="relative h-64 md:h-80 rounded-2xl overflow-hidden">
+              {clinic.fotoPortada ? (
                 <Image
                   src={clinic.fotoPortada.url}
                   alt={`Clínica veterinaria ${clinic.nombre}`}
@@ -119,8 +142,10 @@ export default async function ClinicaPage({ params }: Props) {
                   priority
                   sizes="(max-width: 1024px) 100vw, 66vw"
                 />
-              </div>
-            )}
+              ) : (
+                <PagePlaceholder nombre={clinic.nombre} ciudad={clinic.ciudad} />
+              )}
+            </div>
 
             {/* Nombre y badges */}
             <div>

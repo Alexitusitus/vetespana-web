@@ -7,6 +7,30 @@ interface Props {
   clinic: Clinic
 }
 
+const GRADIENTS = [
+  'from-teal-400 to-cyan-600',
+  'from-emerald-400 to-teal-600',
+  'from-cyan-400 to-blue-600',
+  'from-teal-500 to-emerald-700',
+  'from-blue-400 to-teal-600',
+  'from-green-400 to-emerald-600',
+]
+
+function ClinicPlaceholder({ nombre, ciudad }: { nombre: string; ciudad: string }) {
+  const idx = nombre.charCodeAt(0) % GRADIENTS.length
+  const gradient = GRADIENTS[idx]
+  const inicial = nombre.charAt(0).toUpperCase()
+
+  return (
+    <div className={`w-full h-full flex flex-col items-center justify-center bg-gradient-to-br ${gradient} gap-2`}>
+      <div className="w-14 h-14 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-2xl shadow-inner">
+        {inicial}
+      </div>
+      <span className="text-white/80 text-xs font-medium tracking-wide uppercase">{ciudad}</span>
+    </div>
+  )
+}
+
 export default function ClinicCard({ clinic }: Props) {
   const isPremium = clinic.plan === 'Premium'
 
@@ -28,9 +52,7 @@ export default function ClinicCard({ clinic }: Props) {
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-5xl bg-gradient-to-br from-teal-50 to-teal-100">
-            🐾
-          </div>
+          <ClinicPlaceholder nombre={clinic.nombre} ciudad={clinic.ciudad} />
         )}
 
         {/* Badges */}

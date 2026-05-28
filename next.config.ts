@@ -12,6 +12,11 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'v5.airtableusercontent.com',
       },
+      {
+        // Google Maps Place Photos
+        protocol: 'https',
+        hostname: 'maps.googleapis.com',
+      },
     ],
   },
 }

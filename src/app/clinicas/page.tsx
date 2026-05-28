@@ -7,6 +7,33 @@ import SearchBar from '@/components/SearchBar'
 
 export const dynamic = 'force-dynamic' // SSR real en cada petición — datos siempre frescos de Airtable
 
+function norm(s: string): string {
+  return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+}
+
+function levenshtein(a: string, b: string): number {
+  const m = a.length, n = b.length
+  const dp = Array.from({ length: m + 1 }, (_, i) =>
+    Array.from({ length: n + 1 }, (_, j) => (i === 0 ? j : j === 0 ? i : 0))
+  )
+  for (let i = 1; i <= m; i++)
+    for (let j = 1; j <= n; j++)
+      dp[i][j] = a[i - 1] === b[j - 1] ? dp[i - 1][j - 1] : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1])
+  return dp[m][n]
+}
+
+// Devuelve true si el campo contiene la palabra (sin tildes) o si hay una palabra
+// en el campo con distancia de edición ≤ 1 (para palabras > 3 letras)
+function fuzzyField(field: string, word: string): boolean {
+  const f = norm(field)
+  if (f.includes(word)) return true
+  if (word.length > 3) {
+    const tokens = f.split(/[\s,.\-/]+/)
+    return tokens.some(t => Math.abs(t.length - word.length) <= 1 && levenshtein(t, word) <= 1)
+  }
+  return false
+}
+
 interface Props {
   searchParams: Promise<{
     ciudad?: string
@@ -47,16 +74,18 @@ export default async function ClinicasPage({ searchParams }: Props) {
     urgencias: params.urgencias === '1',
   })
 
-  // Filtro por búsqueda libre (nombre, ciudad, especialidad, dirección)
-  const q = params.q?.toLowerCase().trim() ?? ''
-  const filtradas = q
-    ? clinicas.filter(
-        (c) =>
-          c.nombre.toLowerCase().includes(q) ||
-          c.ciudad.toLowerCase().includes(q) ||
-          c.especialidades.some((e) => e.toLowerCase().includes(q)) ||
-          c.direccion?.toLowerCase().includes(q) ||
-          c.descripcion?.toLowerCase().includes(q)
+  // Filtro por búsqueda libre — tolerante a tildes y a 1 typo por palabra
+  const q = params.q?.trim() ?? ''
+  const queryWords = norm(q).split(/\s+/).filter(Boolean)
+  const filtradas = queryWords.length
+    ? clinicas.filter((c) =>
+        queryWords.every((word) =>
+          fuzzyField(c.nombre, word) ||
+          fuzzyField(c.ciudad, word) ||
+          c.especialidades.some((e) => fuzzyField(e, word)) ||
+          fuzzyField(c.direccion ?? '', word) ||
+          fuzzyField(c.descripcion ?? '', word)
+        )
       )
     : clinicas
 

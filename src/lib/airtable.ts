@@ -104,7 +104,7 @@ export async function getClinics(options?: {
         { field: 'Plan', direction: 'desc' }, // Premium primero
         { field: 'Valoración media', direction: 'desc' },
       ],
-      maxRecords: options?.limit ?? 200,
+      maxRecords: options?.limit ?? 2000,
     })
     .all()
 

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Search, MapPin } from 'lucide-react'
-import { CIUDADES } from '@/types/clinic'
+import { CIUDADES, CIUDAD_DISPLAY } from '@/types/clinic'
 
 interface Props {
   initialCiudad?: string
@@ -26,8 +26,8 @@ export default function SearchBar({ initialCiudad = '', initialQuery = '' }: Pro
   return (
     <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-2">
       {/* Ciudad */}
-      <div className="relative flex-1">
-        <MapPin size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+      <div className="relative flex-1 min-w-0">
+        <MapPin size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10" />
         <select
           value={ciudad}
           onChange={(e) => setCiudad(e.target.value)}
@@ -35,14 +35,14 @@ export default function SearchBar({ initialCiudad = '', initialQuery = '' }: Pro
         >
           <option value="">Todas las ciudades</option>
           {CIUDADES.map((c) => (
-            <option key={c} value={c}>{c}</option>
+            <option key={c} value={c}>{CIUDAD_DISPLAY[c] ?? c}</option>
           ))}
         </select>
       </div>
 
       {/* Búsqueda libre */}
-      <div className="relative flex-[2]">
-        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+      <div className="relative flex-[2] min-w-0">
+        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
         <input
           type="text"
           placeholder="Especialidad, nombre de clínica..."

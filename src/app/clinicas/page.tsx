@@ -43,19 +43,24 @@ export default async function ClinicasPage({ searchParams }: Props) {
     urgencias: params.urgencias === '1',
   })
 
-  // Filtro por búsqueda libre (nombre)
-  const q = params.q?.toLowerCase() ?? ''
+  // Filtro por búsqueda libre (nombre, ciudad, especialidad, dirección)
+  const q = params.q?.toLowerCase().trim() ?? ''
   const filtradas = q
     ? clinicas.filter(
         (c) =>
           c.nombre.toLowerCase().includes(q) ||
-          c.especialidades.some((e) => e.toLowerCase().includes(q))
+          c.ciudad.toLowerCase().includes(q) ||
+          c.especialidades.some((e) => e.toLowerCase().includes(q)) ||
+          c.direccion?.toLowerCase().includes(q) ||
+          c.descripcion?.toLowerCase().includes(q)
       )
     : clinicas
 
   // Orden
   if (params.orden === 'nombre') {
     filtradas.sort((a, b) => a.nombre.localeCompare(b.nombre))
+  } else if (params.orden === 'valoracion') {
+    filtradas.sort((a, b) => (b.valoracionMedia ?? 0) - (a.valoracionMedia ?? 0))
   }
 
   const tituloH1 = [

@@ -126,20 +126,26 @@ export async function getReviewsByClinic(clinicId: string): Promise<Review[]> {
   if (!isConfigured()) return []
   const records = await base('Reseñas')
     .select({
-      filterByFormula: `AND({Aprobada} = TRUE(), FIND("${clinicId}", ARRAYJOIN({Clínica})) > 0)`,
+      filterByFormula: `{Aprobada} = TRUE()`,
       sort: [{ field: 'Fecha', direction: 'desc' }],
     })
     .all()
 
-  return records.map((r) => ({
-    id: r.id,
-    clinicaId: clinicId,
-    nombreUsuario: (r.fields['Nombre usuario'] as string) ?? 'Anónimo',
-    puntuacion: (r.fields['Puntuación'] as number) ?? 0,
-    comentario: (r.fields['Comentario'] as string) ?? '',
-    fecha: (r.fields['Fecha'] as string) ?? '',
-    aprobada: true,
-  }))
+  // Filtramos en JS porque ARRAYJOIN({Clínica}) devuelve nombres, no IDs
+  return records
+    .filter((r) => {
+      const clinica = r.fields['Clínica'] as string[] | undefined
+      return Array.isArray(clinica) && clinica.includes(clinicId)
+    })
+    .map((r) => ({
+      id: r.id,
+      clinicaId: clinicId,
+      nombreUsuario: (r.fields['Nombre usuario'] as string) ?? 'Anónimo',
+      puntuacion: (r.fields['Puntuación'] as number) ?? 0,
+      comentario: (r.fields['Comentario'] as string) ?? '',
+      fecha: (r.fields['Fecha'] as string) ?? '',
+      aprobada: true,
+    }))
 }
 
 export async function getFeaturedClinics(): Promise<Clinic[]> {

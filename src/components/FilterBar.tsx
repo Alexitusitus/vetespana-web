@@ -1,102 +1,191 @@
 'use client'
 
 import { useRouter, useSearchParams } from 'next/navigation'
-import { ESPECIALIDADES, CIUDADES_POR_COMUNIDAD, CIUDAD_DISPLAY } from '@/types/clinic'
-import { SlidersHorizontal, X } from 'lucide-react'
+import {
+  ESPECIALIDADES,
+  ESPECIALIDAD_EMOJI,
+  CIUDADES_POR_COMUNIDAD,
+  CIUDAD_DISPLAY,
+  COMUNIDADES,
+  COMUNIDAD_EMOJI,
+} from '@/types/clinic'
+import { SlidersHorizontal, X, MapPin, Map, Stethoscope, ArrowUpDown } from 'lucide-react'
+
+// Dada una ciudad, encuentra a qué comunidad pertenece
+function comunidadDeCiudad(ciudad: string): string {
+  for (const [com, ciudades] of Object.entries(CIUDADES_POR_COMUNIDAD)) {
+    if (ciudades.includes(ciudad)) return com
+  }
+  return ''
+}
 
 export default function FilterBar() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
   const ciudad = searchParams.get('ciudad') ?? ''
-  const comunidad = searchParams.get('comunidad') ?? ''
+  const comunidadParam = searchParams.get('comunidad') ?? ''
   const especialidad = searchParams.get('especialidad') ?? ''
   const urgencias = searchParams.get('urgencias') === '1'
   const orden = searchParams.get('orden') ?? 'relevancia'
 
+  // Comunidad efectiva: la del filtro, o la deducida de la ciudad elegida
+  const comunidad = comunidadParam || (ciudad ? comunidadDeCiudad(ciudad) : '')
+  const ciudadesDeComunidad = comunidad ? CIUDADES_POR_COMUNIDAD[comunidad] ?? [] : []
+
   const hayFiltrosActivos = ciudad || comunidad || especialidad || urgencias
 
-  function update(key: string, value: string | null) {
-    const params = new URLSearchParams(searchParams.toString())
-    if (value === null || value === '') {
-      params.delete(key)
-    } else {
-      params.set(key, value)
-    }
-    // ciudad y comunidad son mutuamente excluyentes
-    if (key === 'ciudad' && value) params.delete('comunidad')
-    if (key === 'comunidad' && value) params.delete('ciudad')
+  function push(params: URLSearchParams) {
     router.push(`/clinicas?${params.toString()}`)
+  }
+
+  // Al elegir comunidad: fija comunidad y resetea la ciudad
+  function setComunidad(value: string) {
+    const params = new URLSearchParams(searchParams.toString())
+    params.delete('ciudad')
+    if (value) params.set('comunidad', value)
+    else params.delete('comunidad')
+    push(params)
+  }
+
+  // Al elegir ciudad: fija ciudad y conserva su comunidad
+  function setCiudad(value: string) {
+    const params = new URLSearchParams(searchParams.toString())
+    if (value) {
+      params.set('ciudad', value)
+      const com = comunidadDeCiudad(value)
+      if (com) params.set('comunidad', com)
+    } else {
+      params.delete('ciudad')
+      // mantiene la comunidad efectiva como filtro al quitar la ciudad
+      if (comunidad) params.set('comunidad', comunidad)
+    }
+    push(params)
+  }
+
+  function setSimple(key: string, value: string | null) {
+    const params = new URLSearchParams(searchParams.toString())
+    if (value === null || value === '') params.delete(key)
+    else params.set(key, value)
+    push(params)
   }
 
   function limpiarFiltros() {
     const params = new URLSearchParams()
     const q = searchParams.get('q')
     if (q) params.set('q', q)
-    router.push(`/clinicas?${params.toString()}`)
+    push(params)
   }
+
+  const selectBase =
+    'w-full appearance-none text-sm border border-gray-200 rounded-xl pl-9 pr-8 py-2.5 text-gray-700 bg-white cursor-pointer transition-shadow focus:outline-none focus:ring-2 focus:ring-teal-400 hover:border-teal-300 disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed'
 
   return (
     <div className="space-y-3">
-      {/* Fila de controles */}
-      <div className="bg-white border border-gray-200 rounded-2xl p-4 flex flex-wrap gap-3 items-center">
-        <div className="flex items-center gap-2 text-gray-500 font-medium text-sm">
-          <SlidersHorizontal size={15} />
+      <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
+        <div className="flex items-center gap-2 text-gray-500 font-semibold text-sm mb-3">
+          <SlidersHorizontal size={15} className="text-teal-600" />
           Filtros
         </div>
 
-        {/* Ciudad agrupada por comunidad */}
-        <select
-          value={ciudad}
-          onChange={(e) => update('ciudad', e.target.value)}
-          aria-label="Filtrar por ciudad"
-          className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-400 bg-white cursor-pointer"
-        >
-          <option value="">{comunidad ? `Todas en ${comunidad}` : 'Todas las ciudades'}</option>
-          {Object.entries(CIUDADES_POR_COMUNIDAD).map(([com, ciudades]) => (
-            <optgroup key={com} label={com}>
-              {ciudades.map((c) => (
-                <option key={c} value={c}>{CIUDAD_DISPLAY[c] ?? c}</option>
-              ))}
-            </optgroup>
-          ))}
-        </select>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {/* Comunidad autónoma */}
+          <div>
+            <label className="block text-xs font-medium text-gray-400 mb-1 ml-1">Comunidad</label>
+            <div className="relative">
+              <Map size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+              <select
+                value={comunidad}
+                onChange={(e) => setComunidad(e.target.value)}
+                aria-label="Filtrar por comunidad autónoma"
+                className={selectBase}
+              >
+                <option value="">Todas las comunidades</option>
+                {COMUNIDADES.map((com) => (
+                  <option key={com} value={com}>
+                    {COMUNIDAD_EMOJI[com] ? `${COMUNIDAD_EMOJI[com]} ` : ''}{com}
+                  </option>
+                ))}
+              </select>
+              <Chevron />
+            </div>
+          </div>
 
-        {/* Especialidad */}
-        <select
-          value={especialidad}
-          onChange={(e) => update('especialidad', e.target.value)}
-          aria-label="Filtrar por especialidad"
-          className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-400 bg-white cursor-pointer"
-        >
-          <option value="">Todas las especialidades</option>
-          {ESPECIALIDADES.map((e) => (
-            <option key={e} value={e}>{e}</option>
-          ))}
-        </select>
+          {/* Ciudad (depende de la comunidad) */}
+          <div>
+            <label className="block text-xs font-medium text-gray-400 mb-1 ml-1">Ciudad</label>
+            <div className="relative">
+              <MapPin size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+              <select
+                value={ciudad}
+                onChange={(e) => setCiudad(e.target.value)}
+                disabled={!comunidad}
+                aria-label="Filtrar por ciudad"
+                className={selectBase}
+              >
+                <option value="">
+                  {comunidad ? `Todas en ${comunidad}` : 'Elige comunidad primero'}
+                </option>
+                {ciudadesDeComunidad.map((c) => (
+                  <option key={c} value={c}>{CIUDAD_DISPLAY[c] ?? c}</option>
+                ))}
+              </select>
+              <Chevron />
+            </div>
+          </div>
+
+          {/* Especialidad con emoji */}
+          <div>
+            <label className="block text-xs font-medium text-gray-400 mb-1 ml-1">Especialidad</label>
+            <div className="relative">
+              <Stethoscope size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+              <select
+                value={especialidad}
+                onChange={(e) => setSimple('especialidad', e.target.value)}
+                aria-label="Filtrar por especialidad"
+                className={selectBase}
+              >
+                <option value="">Todas las especialidades</option>
+                {ESPECIALIDADES.map((e) => (
+                  <option key={e} value={e}>
+                    {ESPECIALIDAD_EMOJI[e] ? `${ESPECIALIDAD_EMOJI[e]} ` : ''}{e}
+                  </option>
+                ))}
+              </select>
+              <Chevron />
+            </div>
+          </div>
+
+          {/* Ordenar */}
+          <div>
+            <label className="block text-xs font-medium text-gray-400 mb-1 ml-1">Ordenar</label>
+            <div className="relative">
+              <ArrowUpDown size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+              <select
+                value={orden}
+                onChange={(e) => setSimple('orden', e.target.value === 'relevancia' ? null : e.target.value)}
+                aria-label="Ordenar resultados"
+                className={selectBase}
+              >
+                <option value="relevancia">Relevancia</option>
+                <option value="valoracion">Mejor valoradas</option>
+                <option value="nombre">Por nombre</option>
+              </select>
+              <Chevron />
+            </div>
+          </div>
+        </div>
 
         {/* Urgencias 24h */}
-        <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-700 select-none">
+        <label className="mt-3 inline-flex items-center gap-2 cursor-pointer text-sm text-gray-700 select-none">
           <input
             type="checkbox"
             checked={urgencias}
-            onChange={(e) => update('urgencias', e.target.checked ? '1' : null)}
+            onChange={(e) => setSimple('urgencias', e.target.checked ? '1' : null)}
             className="rounded accent-teal-600 w-4 h-4 cursor-pointer"
           />
-          Urgencias 24h
+          🚨 Solo con urgencias 24h
         </label>
-
-        {/* Ordenar */}
-        <select
-          value={orden}
-          onChange={(e) => update('orden', e.target.value)}
-          aria-label="Ordenar resultados"
-          className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-400 bg-white cursor-pointer ml-auto"
-        >
-          <option value="relevancia">Ordenar: Relevancia</option>
-          <option value="valoracion">Mejor valoradas</option>
-          <option value="nombre">Por nombre</option>
-        </select>
       </div>
 
       {/* Chips de filtros activos */}
@@ -106,17 +195,17 @@ export default function FilterBar() {
 
           {comunidad && (
             <button
-              onClick={() => update('comunidad', null)}
+              onClick={() => setComunidad('')}
               className="inline-flex items-center gap-1.5 bg-teal-50 text-teal-700 border border-teal-200 text-xs font-medium px-3 py-1 rounded-full hover:bg-teal-100 transition-colors"
             >
-              🗺️ {comunidad}
+              {COMUNIDAD_EMOJI[comunidad] ?? '🗺️'} {comunidad}
               <X size={12} />
             </button>
           )}
 
           {ciudad && (
             <button
-              onClick={() => update('ciudad', null)}
+              onClick={() => setCiudad('')}
               className="inline-flex items-center gap-1.5 bg-teal-50 text-teal-700 border border-teal-200 text-xs font-medium px-3 py-1 rounded-full hover:bg-teal-100 transition-colors"
             >
               📍 {CIUDAD_DISPLAY[ciudad] ?? ciudad}
@@ -126,17 +215,17 @@ export default function FilterBar() {
 
           {especialidad && (
             <button
-              onClick={() => update('especialidad', null)}
+              onClick={() => setSimple('especialidad', null)}
               className="inline-flex items-center gap-1.5 bg-teal-50 text-teal-700 border border-teal-200 text-xs font-medium px-3 py-1 rounded-full hover:bg-teal-100 transition-colors"
             >
-              🩺 {especialidad}
+              {ESPECIALIDAD_EMOJI[especialidad] ?? '🩺'} {especialidad}
               <X size={12} />
             </button>
           )}
 
           {urgencias && (
             <button
-              onClick={() => update('urgencias', null)}
+              onClick={() => setSimple('urgencias', null)}
               className="inline-flex items-center gap-1.5 bg-red-50 text-red-600 border border-red-200 text-xs font-medium px-3 py-1 rounded-full hover:bg-red-100 transition-colors"
             >
               🚨 Urgencias 24h
@@ -153,5 +242,17 @@ export default function FilterBar() {
         </div>
       )}
     </div>
+  )
+}
+
+// Flechita decorativa a la derecha de cada select
+function Chevron() {
+  return (
+    <svg
+      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+      width="12" height="12" viewBox="0 0 12 12" fill="none"
+    >
+      <path d="M2.5 4.5L6 8l3.5-3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
   )
 }

@@ -56,6 +56,23 @@ export const ESPECIALIDADES = [
   'Hospitalización',
 ] as const
 
+// Emoji para cada especialidad (se usa en los filtros y chips)
+export const ESPECIALIDAD_EMOJI: Record<string, string> = {
+  'Perros':            '🐶',
+  'Gatos':             '🐱',
+  'Animales exóticos': '🦎',
+  'Reptiles':          '🐢',
+  'Aves':              '🦜',
+  'Urgencias':         '🚨',
+  'Cirugía':           '🔪',
+  'Dermatología':      '🧴',
+  'Odontología':       '🦷',
+  'Traumatología':     '🦴',
+  'Oncología':         '🎗️',
+  'Cardiología':       '❤️',
+  'Hospitalización':   '🏥',
+}
+
 export const CIUDADES_POR_COMUNIDAD: Record<string, string[]> = {
   'Andalucía':            ['Adra', 'Alcalá de Guadaíra', 'Algeciras', 'Almería', 'Almuñécar', 'Ayamonte', 'Baza', 'Cádiz', 'Chiclana de la Frontera', 'Córdoba', 'Dos Hermanas', 'Écija', 'El Ejido', 'El Puerto de Santa María', 'Estepona', 'Fuengirola', 'Granada', 'Guadix', 'Huelva', 'Isla Cristina', 'Jerez de la Frontera', 'La Línea de la Concepción', 'Lebrija', 'Lepe', 'Linares', 'Loja', 'Lucena', 'Mairena del Aljarafe', 'Málaga', 'Marbella', 'Mijas', 'Montilla', 'Morón de la Frontera', 'Motril', 'Priego de Córdoba', 'Puente Genil', 'Roquetas de Mar', 'Ronda', 'San Fernando', 'Sanlúcar de Barrameda', 'Sevilla', 'Úbeda', 'Utrera', 'Vélez-Málaga'],
   'Aragón':               ['Alcañiz', 'Barbastro', 'Calatayud', 'Fraga', 'Huesca', 'Monzón', 'Teruel', 'Zaragoza'],

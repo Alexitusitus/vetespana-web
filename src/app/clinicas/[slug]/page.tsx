@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import {
   MapPin, Phone, Globe, Mail, Clock, ShieldCheck,
-  Star, Zap, ArrowLeft, MessageCircle
+  Star, Zap, ArrowLeft, MessageCircle, Share2
 } from 'lucide-react'
 import { getClinicBySlug, getAllClinicSlugs, getReviewsByClinic } from '@/lib/airtable'
 import ReviewForm from '@/components/ReviewForm'
@@ -86,7 +86,8 @@ export default async function ClinicaPage({ params }: Props) {
   if (!clinic) notFound()
 
   const isPremium = clinic.plan === 'Premium'
-  const whatsappUrl = `https://wa.me/34${clinic.telefono.replace(/\D/g, '')}`
+  const whatsappNumero = (clinic.whatsapp ?? clinic.telefono ?? '').replace(/\D/g, '')
+  const whatsappUrl = `https://wa.me/${whatsappNumero.startsWith('34') ? '' : '34'}${whatsappNumero}`
 
   // JSON-LD para SEO
   const jsonLd = {
@@ -316,6 +317,20 @@ export default async function ClinicaPage({ params }: Props) {
                     <span className="truncate">{clinic.email}</span>
                   </a>
                 )}
+
+                {clinic.redesSociales && (
+                  <a
+                    href={clinic.redesSociales.startsWith('http') ? clinic.redesSociales : `https://${clinic.redesSociales}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 text-gray-700 hover:text-teal-600 transition-colors group"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-teal-50">
+                      <Share2 size={14} className="text-gray-400 group-hover:text-teal-600" />
+                    </div>
+                    <span className="truncate">{clinic.redesSociales.replace(/^https?:\/\//, '')}</span>
+                  </a>
+                )}
               </div>
 
               {/* Botones de acción */}
@@ -329,8 +344,8 @@ export default async function ClinicaPage({ params }: Props) {
                   </a>
                 )}
 
-                {/* WhatsApp solo para Premium */}
-                {isPremium && clinic.telefono && (
+                {/* WhatsApp: si la clínica ha indicado WhatsApp, o si es Premium */}
+                {(clinic.whatsapp || (isPremium && clinic.telefono)) && (
                   <a
                     href={whatsappUrl}
                     target="_blank"

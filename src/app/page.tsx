@@ -3,8 +3,8 @@ import { Suspense } from 'react'
 import { getFeaturedClinics } from '@/lib/airtable'
 import ClinicCard from '@/components/ClinicCard'
 import SearchBar from '@/components/SearchBar'
+import SpainMap from '@/components/SpainMap'
 import { ArrowRight, ShieldCheck, Star, Zap } from 'lucide-react'
-import { CIUDADES_POR_COMUNIDAD, COMUNIDAD_EMOJI } from '@/types/clinic'
 
 export const dynamic = 'force-dynamic' // SSR real en cada petición — datos siempre frescos de Airtable
 
@@ -54,23 +54,12 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Explorar por comunidad autónoma */}
-      <section className="max-w-6xl mx-auto px-4 py-8">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Busca por comunidad autónoma</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
-          {Object.entries(CIUDADES_POR_COMUNIDAD).map(([comunidad, ciudades]) => (
-            <Link
-              key={comunidad}
-              href={`/clinicas?comunidad=${encodeURIComponent(comunidad)}`}
-              className="flex items-center gap-2.5 bg-white border border-gray-200 rounded-xl px-3 py-2.5 hover:border-teal-300 hover:shadow-sm hover:bg-teal-50 transition-all group"
-            >
-              <span className="text-xl shrink-0">{COMUNIDAD_EMOJI[comunidad]}</span>
-              <div className="min-w-0">
-                <div className="text-sm font-medium text-gray-800 group-hover:text-teal-700 truncate leading-tight">{comunidad}</div>
-                <div className="text-xs text-gray-400 leading-tight">{ciudades.length} {ciudades.length === 1 ? 'ciudad' : 'ciudades'}</div>
-              </div>
-            </Link>
-          ))}
+      {/* Explorar por comunidad autónoma — mapa interactivo */}
+      <section className="max-w-5xl mx-auto px-4 py-8">
+        <h2 className="text-xl font-bold text-gray-900 mb-1 text-center">Busca por comunidad autónoma</h2>
+        <p className="text-sm text-gray-500 mb-5 text-center">Explora las clínicas veterinarias de toda España en el mapa</p>
+        <div className="bg-gradient-to-b from-teal-50/60 to-white rounded-3xl border border-gray-100 p-4 sm:p-6">
+          <SpainMap />
         </div>
       </section>
 

@@ -17,6 +17,8 @@ export interface Clinic {
   telefono: string
   web?: string
   email?: string
+  whatsapp?: string
+  redesSociales?: string
   especialidades: string[]
   horario?: string
   urgencias24h: boolean

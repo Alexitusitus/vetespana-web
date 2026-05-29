@@ -42,6 +42,8 @@ function recordToClinic(record: any): Clinic {
     telefono: f['Teléfono'] ?? '',
     web: f['Web'] ?? undefined,
     email: f['Email'] ?? undefined,
+    whatsapp: f['WhatsApp'] ?? undefined,
+    redesSociales: f['Redes sociales'] ?? undefined,
     especialidades: f['Especialidades'] ?? [],
     horario: f['Horario'] ?? undefined,
     urgencias24h: f['Urgencias 24h'] === true,

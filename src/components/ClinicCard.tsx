@@ -1,10 +1,12 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { MapPin, Phone, Clock, Star, ShieldCheck, Zap } from 'lucide-react'
+import { MapPin, Phone, Clock, Star, ShieldCheck, Zap, Navigation } from 'lucide-react'
 import type { Clinic } from '@/types/clinic'
 
 interface Props {
   clinic: Clinic
+  /** Distancia en km a la ubicación del usuario (solo en "Cerca de mí") */
+  distanciaKm?: number
 }
 
 const GRADIENTS = [
@@ -31,7 +33,7 @@ function ClinicPlaceholder({ nombre, ciudad }: { nombre: string; ciudad: string 
   )
 }
 
-export default function ClinicCard({ clinic }: Props) {
+export default function ClinicCard({ clinic, distanciaKm }: Props) {
   const isPremium = clinic.plan === 'Premium'
 
   return (
@@ -73,6 +75,13 @@ export default function ClinicCard({ clinic }: Props) {
             </span>
           )}
         </div>
+
+        {/* Distancia (solo en "Cerca de mí") */}
+        {distanciaKm !== undefined && (
+          <span className="absolute bottom-3 right-3 bg-white/95 text-teal-700 text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm">
+            <Navigation size={11} className="fill-teal-600" /> a {distanciaKm} km
+          </span>
+        )}
       </div>
 
       {/* Contenido */}

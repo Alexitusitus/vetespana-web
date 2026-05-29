@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next'
 import { getAllClinicSlugs } from '@/lib/airtable'
-import { CIUDADES, CIUDADES_POR_COMUNIDAD } from '@/types/clinic'
+import { CIUDADES, CIUDADES_POR_COMUNIDAD, ESPECIALIDADES } from '@/types/clinic'
 
 export const dynamic = 'force-dynamic'
 
@@ -30,11 +30,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }))
 
-  // Página por cada especialidad
-  const especialidadPages: MetadataRoute.Sitemap = [
-    'Perros', 'Gatos', 'Animales exóticos', 'Urgencias', 'Cirugía',
-    'Dermatología', 'Odontología', 'Traumatología',
-  ].map((esp) => ({
+  // Página por cada especialidad (todas)
+  const especialidadPages: MetadataRoute.Sitemap = ESPECIALIDADES.map((esp) => ({
     url: `${baseUrl}/clinicas?especialidad=${encodeURIComponent(esp)}`,
     lastModified: new Date(),
     changeFrequency: 'weekly' as const,

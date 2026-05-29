@@ -31,6 +31,7 @@ export default function SearchBar({ initialCiudad = '', initialQuery = '' }: Pro
         <select
           value={ciudad}
           onChange={(e) => setCiudad(e.target.value)}
+          aria-label="Selecciona una ciudad"
           className="w-full pl-9 pr-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-400 appearance-none cursor-pointer"
         >
           <option value="">Todas las ciudades</option>
@@ -49,6 +50,7 @@ export default function SearchBar({ initialCiudad = '', initialQuery = '' }: Pro
         <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
         <input
           type="text"
+          aria-label="Buscar por especialidad o nombre de clínica"
           placeholder="Especialidad, nombre de clínica..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -58,7 +60,7 @@ export default function SearchBar({ initialCiudad = '', initialQuery = '' }: Pro
 
       <button
         type="submit"
-        className="bg-teal-600 hover:bg-teal-700 text-white font-semibold px-6 py-3 rounded-xl transition-colors whitespace-nowrap"
+        className="bg-teal-700 hover:bg-teal-800 text-white font-semibold px-6 py-3 rounded-xl transition-colors whitespace-nowrap"
       >
         Buscar
       </button>

@@ -69,7 +69,7 @@ export default async function HomePage() {
           <h2 className="text-2xl font-bold text-gray-900">Clínicas destacadas</h2>
           <Link
             href="/clinicas"
-            className="text-teal-600 font-medium text-sm flex items-center gap-1 hover:gap-2 transition-all"
+            className="text-teal-700 font-medium text-sm flex items-center gap-1 hover:gap-2 transition-all"
           >
             Ver todas <ArrowRight size={15} />
           </Link>
@@ -132,7 +132,7 @@ export default async function HomePage() {
           </p>
           <Link
             href="/alta-clinica"
-            className="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white font-semibold px-7 py-3 rounded-full transition-colors"
+            className="inline-flex items-center gap-2 bg-teal-700 hover:bg-teal-800 text-white font-semibold px-7 py-3 rounded-full transition-colors"
           >
             Añadir mi clínica — es gratis <ArrowRight size={16} />
           </Link>

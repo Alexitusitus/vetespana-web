@@ -63,7 +63,7 @@ export default function ClinicCard({ clinic }: Props) {
             </span>
           )}
           {clinic.verificada && (
-            <span className="bg-teal-500 text-white text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1">
+            <span className="bg-teal-700 text-white text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1">
               <ShieldCheck size={10} /> Verificada
             </span>
           )}

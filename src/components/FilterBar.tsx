@@ -49,6 +49,7 @@ export default function FilterBar() {
         <select
           value={ciudad}
           onChange={(e) => update('ciudad', e.target.value)}
+          aria-label="Filtrar por ciudad"
           className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-400 bg-white cursor-pointer"
         >
           <option value="">{comunidad ? `Todas en ${comunidad}` : 'Todas las ciudades'}</option>
@@ -65,6 +66,7 @@ export default function FilterBar() {
         <select
           value={especialidad}
           onChange={(e) => update('especialidad', e.target.value)}
+          aria-label="Filtrar por especialidad"
           className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-400 bg-white cursor-pointer"
         >
           <option value="">Todas las especialidades</option>
@@ -88,6 +90,7 @@ export default function FilterBar() {
         <select
           value={orden}
           onChange={(e) => update('orden', e.target.value)}
+          aria-label="Ordenar resultados"
           className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-400 bg-white cursor-pointer ml-auto"
         >
           <option value="relevancia">Ordenar: Relevancia</option>

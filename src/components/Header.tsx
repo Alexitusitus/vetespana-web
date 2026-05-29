@@ -16,7 +16,7 @@ export default function Header() {
           </Link>
           <Link
             href="/alta-clinica"
-            className="bg-teal-600 text-white px-4 py-2 rounded-full hover:bg-teal-700 transition-colors"
+            className="bg-teal-700 text-white px-4 py-2 rounded-full hover:bg-teal-800 transition-colors"
           >
             Añade tu clínica
           </Link>
@@ -25,7 +25,7 @@ export default function Header() {
         {/* Mobile */}
         <Link
           href="/alta-clinica"
-          className="md:hidden bg-teal-600 text-white px-3 py-1.5 rounded-full text-sm font-medium"
+          className="md:hidden bg-teal-700 text-white px-3 py-1.5 rounded-full text-sm font-medium"
         >
           Añade tu clínica
         </Link>

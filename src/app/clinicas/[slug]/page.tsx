@@ -6,18 +6,13 @@ import {
   MapPin, Phone, Globe, Mail, Clock, ShieldCheck,
   Star, Zap, ArrowLeft, MessageCircle, Share2
 } from 'lucide-react'
-import { getClinicBySlug, getAllClinicSlugs, getReviewsByClinic } from '@/lib/airtable'
+import { getClinicBySlug, getReviewsByClinic } from '@/lib/airtable'
 import ReviewForm from '@/components/ReviewForm'
 
 export const dynamic = 'force-dynamic' // SSR real en cada petición — datos siempre frescos de Airtable
 
 interface Props {
   params: Promise<{ slug: string }>
-}
-
-export async function generateStaticParams() {
-  const slugs = await getAllClinicSlugs()
-  return slugs.map((slug) => ({ slug }))
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -94,12 +89,10 @@ function StarRating({ rating }: { rating: number }) {
 
 export default async function ClinicaPage({ params }: Props) {
   const { slug } = await params
-  const [clinic, reviews] = await Promise.all([
-    getClinicBySlug(slug),
-    getClinicBySlug(slug).then((c) => (c ? getReviewsByClinic(c.id) : [])),
-  ])
-
+  const clinic = await getClinicBySlug(slug)
   if (!clinic) notFound()
+
+  const reviews = await getReviewsByClinic(clinic.id)
 
   const isPremium = clinic.plan === 'Premium'
   const whatsappNumero = (clinic.whatsapp ?? clinic.telefono ?? '').replace(/\D/g, '')
@@ -123,6 +116,15 @@ export default async function ClinicaPage({ params }: Props) {
     }
   }
 
+  // Normaliza la web de la clínica a una URL absoluta válida (en Airtable a veces
+  // está sin "https://"), para que el dato estructurado no salga roto.
+  const webAbsoluta = clinic.web
+    ? clinic.web.startsWith('http')
+      ? clinic.web
+      : `https://${clinic.web}`
+    : undefined
+  const fichaUrl = `https://www.vetespana.es/clinicas/${slug}`
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'VeterinaryCare',
@@ -135,17 +137,21 @@ export default async function ClinicaPage({ params }: Props) {
       addressCountry: 'ES',
     },
     telephone: clinic.telefono,
-    url: clinic.web ?? `https://www.vetespana.es/clinicas/${slug}`,
-    sameAs: clinic.web ? [`https://www.vetespana.es/clinicas/${slug}`] : undefined,
+    url: webAbsoluta ?? fichaUrl,
+    sameAs: webAbsoluta ? [fichaUrl] : undefined,
     image: clinic.fotoPortada?.url ?? undefined,
     openingHoursSpecification: openingHours.length ? openingHours : undefined,
-    aggregateRating: clinic.valoracionMedia
-      ? {
-          '@type': 'AggregateRating',
-          ratingValue: clinic.valoracionMedia,
-          reviewCount: reviews.length || 1,
-        }
-      : undefined,
+    // Solo declaramos valoración a Google si hay reseñas REALES visibles en la
+    // página. Declarar estrellas sin reseñas visibles viola la política de Google
+    // y puede provocar una acción manual que quite todas las estrellas del sitio.
+    aggregateRating:
+      clinic.valoracionMedia && reviews.length > 0
+        ? {
+            '@type': 'AggregateRating',
+            ratingValue: clinic.valoracionMedia,
+            reviewCount: reviews.length,
+          }
+        : undefined,
   }
 
   return (

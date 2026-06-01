@@ -13,6 +13,7 @@ export default function ReviewForm({ clinicId, clinicNombre }: Props) {
   const [puntuacion, setPuntuacion] = useState(0)
   const [hovered, setHovered] = useState(0)
   const [comentario, setComentario] = useState('')
+  const [website, setWebsite] = useState('') // honeypot anti-bots: debe quedar vacío
   const [estado, setEstado] = useState<'idle' | 'loading' | 'ok' | 'error'>('idle')
 
   async function handleSubmit(e: React.FormEvent) {
@@ -24,7 +25,7 @@ export default function ReviewForm({ clinicId, clinicNombre }: Props) {
       const res = await fetch('/api/reviews', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ clinicId, nombreUsuario: nombre, puntuacion, comentario }),
+        body: JSON.stringify({ clinicId, nombreUsuario: nombre, puntuacion, comentario, website }),
       })
       if (res.ok) {
         setEstado('ok')
@@ -51,6 +52,18 @@ export default function ReviewForm({ clinicId, clinicNombre }: Props) {
   return (
     <form onSubmit={handleSubmit} className="border-t border-gray-100 pt-5 mt-2 space-y-4">
       <h3 className="font-semibold text-gray-800">Escribe tu reseña</h3>
+
+      {/* Honeypot: invisible para personas; los bots lo rellenan y la reseña se descarta */}
+      <input
+        type="text"
+        name="website"
+        tabIndex={-1}
+        autoComplete="off"
+        value={website}
+        onChange={(e) => setWebsite(e.target.value)}
+        aria-hidden="true"
+        style={{ position: 'absolute', left: '-9999px', width: 1, height: 1, opacity: 0 }}
+      />
 
       {/* Selector de estrellas */}
       <div>

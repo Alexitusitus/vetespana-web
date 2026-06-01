@@ -23,6 +23,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.75,
   }))
 
+  // Una URL por ciudad — el mayor activo de SEO local ("veterinario en {ciudad}").
+  // Cada una tiene H1, título, descripción y canonical propios (no duplican).
+  const ciudadPages: MetadataRoute.Sitemap = Object.values(CIUDADES_POR_COMUNIDAD)
+    .flat()
+    .map((ciudad) => ({
+      url: `${baseUrl}/clinicas?ciudad=${encodeURIComponent(ciudad)}`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.7,
+    }))
+
   // Fichas individuales — el grueso del valor SEO (páginas únicas por clínica)
   const slugs = await getAllClinicSlugs()
   const clinicPages: MetadataRoute.Sitemap = slugs.map((slug) => ({
@@ -32,8 +43,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }))
 
-  // NOTA: Las URLs ?ciudad= y ?especialidad= se excluyen del sitemap a propósito.
-  // Son páginas de filtro (contenido dinámico solapado) que gastan presupuesto de rastreo
-  // sin aportar valor SEO adicional — Google las descubrirá por los enlaces internos.
-  return [...staticPages, ...comunidadPages, ...clinicPages]
+  // NOTA: Las URLs ?especialidad= y las combinaciones de filtros se excluyen a propósito
+  // (contenido solapado que gasta presupuesto de rastreo). Google las descubrirá por los
+  // enlaces internos. Sí incluimos ?ciudad= porque son páginas locales de alto valor SEO.
+  return [...staticPages, ...comunidadPages, ...ciudadPages, ...clinicPages]
 }

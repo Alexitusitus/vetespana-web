@@ -1,6 +1,7 @@
 import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { getClinics } from '@/lib/airtable'
+import { CIUDAD_DISPLAY } from '@/types/clinic'
 import ClinicCard from '@/components/ClinicCard'
 import FilterBar from '@/components/FilterBar'
 import SearchBar from '@/components/SearchBar'
@@ -43,6 +44,33 @@ interface Props {
     q?: string
     orden?: string
   }>
+}
+
+// Suma simple de los caracteres del nombre del lugar → elige variante de texto.
+// Así cada ciudad tiene una intro distinta (evita texto duplicado de cara a Google),
+// pero siempre la misma para una ciudad dada (estable entre visitas).
+function hashLugar(s: string): number {
+  let h = 0
+  for (let i = 0; i < s.length; i++) h = (h + s.charCodeAt(i)) % 997
+  return h
+}
+
+// Texto SEO único para una página de ciudad / comunidad.
+function textoSeoLugar(lugar: string, count: number, especialidad?: string): string[] {
+  const n = count > 0 ? `${count}` : 'las mejores'
+  const intros = [
+    `¿Buscas un veterinario en ${lugar}? En VetEspaña reunimos ${n} clínicas veterinarias de ${lugar} para que compares y elijas con confianza.`,
+    `En ${lugar} encontrarás ${n} clínicas veterinarias listadas en VetEspaña, con toda la información que necesitas para cuidar de tu mascota.`,
+    `Hemos reunido ${n} clínicas veterinarias en ${lugar} para ayudarte a encontrar el centro que mejor se adapta a ti y a tu mascota.`,
+    `Descubre ${n} clínicas veterinarias en ${lugar}: compara horarios, especialidades y opiniones antes de decidir.`,
+  ]
+  const intro = intros[hashLugar(lugar) % intros.length]
+
+  const segundo = especialidad
+    ? `Aquí ves los centros de ${lugar} con servicios de ${especialidad.toLowerCase()}. En cada ficha encontrarás el teléfono, la dirección, el horario y las opiniones de otros dueños de mascotas.`
+    : `En cada ficha puedes ver fotos, horarios reales, teléfono, especialidades y reseñas. Filtra por urgencias 24h o por especialidad para encontrar exactamente lo que necesitas, y llama o escribe a la clínica directamente.`
+
+  return [intro, segundo]
 }
 
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
@@ -114,10 +142,12 @@ export default async function ClinicasPage({ searchParams }: Props) {
   }
 
   const lugar = params.ciudad ?? params.comunidad ?? 'España'
+  // Nombre bonito para mostrar (p.ej. "Logroño" en vez del valor de Airtable "Logrono")
+  const lugarDisplay = params.ciudad ? CIUDAD_DISPLAY[params.ciudad] ?? params.ciudad : lugar
   const tituloH1 = [
     'Clínicas veterinarias',
     params.especialidad ? `· ${params.especialidad}` : '',
-    `en ${lugar}`,
+    `en ${lugarDisplay}`,
   ]
     .filter(Boolean)
     .join(' ')
@@ -156,6 +186,18 @@ export default async function ClinicasPage({ searchParams }: Props) {
           <div className="text-5xl mb-4">🔍</div>
           <p className="text-lg font-medium text-gray-600 mb-2">Sin resultados</p>
           <p className="text-sm">Prueba a cambiar los filtros o ampliar la búsqueda</p>
+        </div>
+      )}
+
+      {/* Texto SEO único por ciudad / comunidad (contenido propio para Google) */}
+      {(params.ciudad || params.comunidad) && (
+        <div className="mt-14 max-w-3xl text-sm text-gray-500 space-y-3 border-t border-gray-100 pt-8">
+          <h2 className="text-base font-semibold text-gray-700">
+            Clínicas veterinarias en {lugarDisplay}
+          </h2>
+          {textoSeoLugar(lugarDisplay, filtradas.length, params.especialidad).map((p, i) => (
+            <p key={i}>{p}</p>
+          ))}
         </div>
       )}
     </div>

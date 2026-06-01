@@ -298,9 +298,12 @@ export default async function ClinicaPage({ params }: Props) {
             </div>
           </div>
 
-          {/* Columna lateral — datos de contacto */}
-          <div className="space-y-4">
-            <div className="bg-white rounded-2xl border border-gray-200 p-5 sticky top-20">
+          {/* Columna lateral — datos de contacto.
+              El sticky va en TODA la columna (contacto + Google Maps) para que el
+              botón de Maps se mueva junto al panel y no quede tapado al hacer scroll.
+              En móvil se desactiva el sticky (lg:) para que fluya normal. */}
+          <div className="space-y-4 lg:sticky lg:top-20 lg:self-start">
+            <div className="bg-white rounded-2xl border border-gray-200 p-5">
               <h2 className="font-bold text-gray-900 mb-4">Contacto</h2>
 
               <div className="space-y-3 text-sm">

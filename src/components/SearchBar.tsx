@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Search, MapPin } from 'lucide-react'
-import { CIUDADES_POR_COMUNIDAD, CIUDAD_DISPLAY } from '@/types/clinic'
+import { Search } from 'lucide-react'
+import CitySelect from './CitySelect'
 
 interface Props {
   initialCiudad?: string
@@ -25,24 +25,9 @@ export default function SearchBar({ initialCiudad = '', initialQuery = '' }: Pro
 
   return (
     <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-2">
-      {/* Ciudad agrupada por comunidad */}
-      <div className="relative flex-1 min-w-0">
-        <MapPin size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10" />
-        <select
-          value={ciudad}
-          onChange={(e) => setCiudad(e.target.value)}
-          aria-label="Selecciona una ciudad"
-          className="w-full pl-9 pr-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-400 appearance-none cursor-pointer"
-        >
-          <option value="">Todas las ciudades</option>
-          {Object.entries(CIUDADES_POR_COMUNIDAD).map(([comunidad, ciudades]) => (
-            <optgroup key={comunidad} label={comunidad}>
-              {ciudades.map((c) => (
-                <option key={c} value={c}>{CIUDAD_DISPLAY[c] ?? c}</option>
-              ))}
-            </optgroup>
-          ))}
-        </select>
+      {/* Ciudad con autocompletado: escribe "madr" y aparece Madrid */}
+      <div className="flex-1 min-w-0">
+        <CitySelect value={ciudad} onChange={setCiudad} />
       </div>
 
       {/* Búsqueda libre */}

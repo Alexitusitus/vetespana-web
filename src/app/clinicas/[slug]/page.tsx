@@ -25,16 +25,32 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const clinic = await getClinicBySlug(slug)
   if (!clinic) return {}
 
+  // Descripción meta única: combina descripción de Airtable + datos clave
+  const espDestacadas = clinic.especialidades.filter((e) => !['Perros', 'Gatos'].includes(e)).slice(0, 3)
+  const metaDesc = clinic.descripcion
+    ? clinic.descripcion.substring(0, 155)
+    : [
+        `${clinic.nombre} — veterinario en ${clinic.ciudad}.`,
+        clinic.urgencias24h ? 'Urgencias 24h.' : '',
+        espDestacadas.length ? `Especialidades: ${espDestacadas.join(', ')}.` : 'Consultas, vacunas y cirugía.',
+        clinic.telefono ? `Tel: ${clinic.telefono}.` : '',
+      ].filter(Boolean).join(' ').substring(0, 155)
+
+  const title = clinic.urgencias24h
+    ? `${clinic.nombre} — Veterinario 24h en ${clinic.ciudad}`
+    : `${clinic.nombre} — Clínica veterinaria en ${clinic.ciudad}`
+
   return {
-    title: `${clinic.nombre} — Clínica veterinaria en ${clinic.ciudad}`,
-    description:
-      clinic.descripcion ??
-      `${clinic.nombre} es una clínica veterinaria en ${clinic.ciudad}. ` +
-        `Especialidades: ${clinic.especialidades.join(', ')}. Teléfono: ${clinic.telefono}.`,
+    title,
+    description: metaDesc,
+    alternates: {
+      canonical: `https://www.vetespana.es/clinicas/${slug}`,
+    },
     openGraph: {
       title: clinic.nombre,
-      description: `Clínica veterinaria en ${clinic.ciudad}`,
-      images: clinic.fotoPortada ? [clinic.fotoPortada.url] : [],
+      description: metaDesc,
+      url: `https://www.vetespana.es/clinicas/${slug}`,
+      images: clinic.fotoPortada ? [{ url: clinic.fotoPortada.url, alt: `Clínica veterinaria ${clinic.nombre}` }] : [],
     },
   }
 }
@@ -89,11 +105,29 @@ export default async function ClinicaPage({ params }: Props) {
   const whatsappNumero = (clinic.whatsapp ?? clinic.telefono ?? '').replace(/\D/g, '')
   const whatsappUrl = `https://wa.me/${whatsappNumero.startsWith('34') ? '' : '34'}${whatsappNumero}`
 
-  // JSON-LD para SEO
+  // JSON-LD para SEO — VeterinaryCare con horario y descripción
+  // Parsea las líneas de horario en OpeningHoursSpecification
+  const DAYS_ES: Record<string, string> = {
+    lunes: 'Monday', martes: 'Tuesday', miércoles: 'Wednesday', miercoles: 'Wednesday',
+    jueves: 'Thursday', viernes: 'Friday', sábado: 'Saturday', sabado: 'Saturday', domingo: 'Sunday',
+  }
+  const openingHours: { '@type': string; dayOfWeek: string | string[]; opens: string; closes: string }[] = []
+  if (clinic.horario) {
+    for (const line of clinic.horario.split('\n')) {
+      const m = line.match(/^(\w+):\s*(\d{1,2}[:–\-]\d{2})[\s–\-–]+(\d{1,2}[:–\-]\d{2})/i)
+      if (!m) continue
+      const day = DAYS_ES[m[1].toLowerCase()]
+      if (!day) continue
+      const fmt = (t: string) => t.replace(/[^\d:]/g, ':').replace(/^(\d):/, '0$1:')
+      openingHours.push({ '@type': 'OpeningHoursSpecification', dayOfWeek: day, opens: fmt(m[2]), closes: fmt(m[3]) })
+    }
+  }
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'VeterinaryCare',
     name: clinic.nombre,
+    description: clinic.descripcion ?? undefined,
     address: {
       '@type': 'PostalAddress',
       streetAddress: clinic.direccion,
@@ -101,8 +135,10 @@ export default async function ClinicaPage({ params }: Props) {
       addressCountry: 'ES',
     },
     telephone: clinic.telefono,
-    url: clinic.web ?? undefined,
+    url: clinic.web ?? `https://www.vetespana.es/clinicas/${slug}`,
+    sameAs: clinic.web ? [`https://www.vetespana.es/clinicas/${slug}`] : undefined,
     image: clinic.fotoPortada?.url ?? undefined,
+    openingHoursSpecification: openingHours.length ? openingHours : undefined,
     aggregateRating: clinic.valoracionMedia
       ? {
           '@type': 'AggregateRating',

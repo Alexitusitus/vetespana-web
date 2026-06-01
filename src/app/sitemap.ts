@@ -1,13 +1,13 @@
 import type { MetadataRoute } from 'next'
 import { getAllClinicSlugs } from '@/lib/airtable'
-import { CIUDADES, CIUDADES_POR_COMUNIDAD, ESPECIALIDADES } from '@/types/clinic'
+import { CIUDADES_POR_COMUNIDAD } from '@/types/clinic'
 
 export const dynamic = 'force-dynamic'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://www.vetespana.es'
 
-  // Páginas estáticas
+  // Páginas estáticas principales
   const staticPages: MetadataRoute.Sitemap = [
     { url: baseUrl, lastModified: new Date(), changeFrequency: 'daily', priority: 1 },
     { url: `${baseUrl}/clinicas`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
@@ -15,31 +15,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/alta-clinica`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.5 },
   ]
 
-  // Página por cada ciudad
-  const ciudadPages: MetadataRoute.Sitemap = CIUDADES.map((ciudad) => ({
-    url: `${baseUrl}/clinicas?ciudad=${encodeURIComponent(ciudad)}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly' as const,
-    priority: 0.85,
-  }))
-
-  // Página por cada comunidad autónoma
+  // Una URL por comunidad autónoma — valor semántico alto, poca duplicación
   const comunidadPages: MetadataRoute.Sitemap = Object.keys(CIUDADES_POR_COMUNIDAD).map((comunidad) => ({
     url: `${baseUrl}/clinicas?comunidad=${encodeURIComponent(comunidad)}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly' as const,
-    priority: 0.8,
-  }))
-
-  // Página por cada especialidad (todas)
-  const especialidadPages: MetadataRoute.Sitemap = ESPECIALIDADES.map((esp) => ({
-    url: `${baseUrl}/clinicas?especialidad=${encodeURIComponent(esp)}`,
     lastModified: new Date(),
     changeFrequency: 'weekly' as const,
     priority: 0.75,
   }))
 
-  // Fichas individuales de clínicas
+  // Fichas individuales — el grueso del valor SEO (páginas únicas por clínica)
   const slugs = await getAllClinicSlugs()
   const clinicPages: MetadataRoute.Sitemap = slugs.map((slug) => ({
     url: `${baseUrl}/clinicas/${slug}`,
@@ -48,5 +32,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }))
 
-  return [...staticPages, ...ciudadPages, ...comunidadPages, ...especialidadPages, ...clinicPages]
+  // NOTA: Las URLs ?ciudad= y ?especialidad= se excluyen del sitemap a propósito.
+  // Son páginas de filtro (contenido dinámico solapado) que gastan presupuesto de rastreo
+  // sin aportar valor SEO adicional — Google las descubrirá por los enlaces internos.
+  return [...staticPages, ...comunidadPages, ...clinicPages]
 }

@@ -58,9 +58,26 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     : 'Todas las clínicas veterinarias en España'
 
   const lugar = params.comunidad ?? params.ciudad ?? 'España'
+
+  // Descripción única por filtro activo
+  let description = `Directorio de clínicas veterinarias en ${lugar}.`
+  if (params.especialidad) description += ` Especialistas en ${params.especialidad.toLowerCase()} para perros, gatos y mascotas.`
+  if (params.urgencias === '1') description += ` Clínicas con urgencias 24 horas disponibles.`
+  description += ` Consulta teléfono, horario y dirección.`
+
+  // Canónica: si hay filtros combinados, apunta a la URL más simple para evitar duplicados
+  const baseUrl = 'https://www.vetespana.es'
+  let canonical = `${baseUrl}/clinicas`
+  if (params.comunidad && !params.ciudad && !params.especialidad && !params.urgencias) {
+    canonical = `${baseUrl}/clinicas?comunidad=${encodeURIComponent(params.comunidad)}`
+  } else if (params.ciudad && !params.especialidad && !params.urgencias) {
+    canonical = `${baseUrl}/clinicas?ciudad=${encodeURIComponent(params.ciudad)}`
+  }
+
   return {
     title,
-    description: `Directorio de clínicas veterinarias en ${lugar}. Filtra por especialidad, urgencias y valoración.`,
+    description,
+    alternates: { canonical },
   }
 }
 

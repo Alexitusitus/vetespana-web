@@ -2,7 +2,7 @@ import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { getClinics } from '@/lib/airtable'
 import { CIUDAD_DISPLAY } from '@/types/clinic'
-import ClinicCard from '@/components/ClinicCard'
+import ClinicGrid from '@/components/ClinicGrid'
 import FilterBar from '@/components/FilterBar'
 import SearchBar from '@/components/SearchBar'
 
@@ -174,13 +174,13 @@ export default async function ClinicasPage({ searchParams }: Props) {
         <span className="text-sm text-gray-500">{filtradas.length} resultado{filtradas.length !== 1 ? 's' : ''}</span>
       </div>
 
-      {/* Grid */}
+      {/* Grid con scroll infinito (pinta 24 y carga más al bajar).
+          Aligeramos los datos enviados al navegador: la tarjeta no usa la
+          descripción larga ni la galería, así que no las mandamos. */}
       {filtradas.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filtradas.map((clinic) => (
-            <ClinicCard key={clinic.id} clinic={clinic} />
-          ))}
-        </div>
+        <ClinicGrid
+          clinics={filtradas.map((c) => ({ ...c, descripcion: undefined, galeriaFotos: [] }))}
+        />
       ) : (
         <div className="text-center py-20 text-gray-400">
           <div className="text-5xl mb-4">🔍</div>

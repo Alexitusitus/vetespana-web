@@ -73,6 +73,7 @@ export default function ReviewForm({ clinicId, clinicNombre }: Props) {
             <button
               key={n}
               type="button"
+              aria-label={`${n} estrella${n > 1 ? 's' : ''}`}
               onClick={() => setPuntuacion(n)}
               onMouseEnter={() => setHovered(n)}
               onMouseLeave={() => setHovered(0)}
@@ -118,7 +119,7 @@ export default function ReviewForm({ clinicId, clinicNombre }: Props) {
           rows={4}
           className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 resize-none"
         />
-        <p className="text-xs text-gray-400 mt-1 text-right">{comentario.length}/500</p>
+        <p className="text-xs text-gray-600 mt-1 text-right">{comentario.length}/500</p>
       </div>
 
       {estado === 'error' && (
@@ -132,7 +133,7 @@ export default function ReviewForm({ clinicId, clinicNombre }: Props) {
       >
         {estado === 'loading' ? 'Enviando...' : 'Publicar reseña'}
       </button>
-      <p className="text-xs text-gray-400 text-center">
+      <p className="text-xs text-gray-600 text-center">
         Las reseñas se revisan antes de publicarse.
       </p>
     </form>

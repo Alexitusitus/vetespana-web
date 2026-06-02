@@ -233,7 +233,7 @@ export default async function ClinicaPage({ params }: Props) {
                 <div className="flex items-center gap-2 mt-2">
                   <StarRating rating={clinic.valoracionMedia} />
                   <span className="font-semibold text-gray-700">{clinic.valoracionMedia.toFixed(1)}</span>
-                  <span className="text-sm text-gray-400">({reviews.length} reseña{reviews.length !== 1 ? 's' : ''})</span>
+                  <span className="text-sm text-gray-600">({reviews.length} reseña{reviews.length !== 1 ? 's' : ''})</span>
                 </div>
               )}
             </div>
@@ -287,7 +287,7 @@ export default async function ClinicaPage({ params }: Props) {
             {/* Reseñas */}
             <div className="bg-white rounded-2xl border border-gray-200 p-5">
               <h2 className="font-bold text-gray-900 mb-4">
-                Reseñas {reviews.length > 0 && <span className="text-gray-400 font-normal">({reviews.length})</span>}
+                Reseñas {reviews.length > 0 && <span className="text-gray-600 font-normal">({reviews.length})</span>}
               </h2>
 
               {reviews.length > 0 ? (
@@ -296,7 +296,7 @@ export default async function ClinicaPage({ params }: Props) {
                     <div key={review.id} className="border-b border-gray-100 last:border-0 pb-4 last:pb-0">
                       <div className="flex items-center justify-between mb-1">
                         <span className="font-semibold text-sm text-gray-800">{review.nombreUsuario}</span>
-                        <span className="text-xs text-gray-400">{new Date(review.fecha).toLocaleDateString('es-ES')}</span>
+                        <span className="text-xs text-gray-600">{new Date(review.fecha).toLocaleDateString('es-ES')}</span>
                       </div>
                       <StarRating rating={review.puntuacion} />
                       <p className="text-sm text-gray-600 mt-2 leading-relaxed">{review.comentario}</p>
@@ -304,7 +304,7 @@ export default async function ClinicaPage({ params }: Props) {
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-gray-400">Todavía no hay reseñas para esta clínica. ¡Sé el primero en opinar!</p>
+                <p className="text-sm text-gray-600">Todavía no hay reseñas para esta clínica. ¡Sé el primero en opinar!</p>
               )}
 
               <ReviewForm clinicId={clinic.id} clinicNombre={clinic.nombre} />

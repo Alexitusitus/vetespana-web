@@ -54,6 +54,7 @@ export default function ClinicCard({ clinic, distanciaKm, priority = false }: Pr
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-300"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            quality={62}
             priority={priority}
           />
         ) : (

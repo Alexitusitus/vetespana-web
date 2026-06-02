@@ -7,6 +7,8 @@ interface Props {
   clinic: Clinic
   /** Distancia en km a la ubicación del usuario (solo en "Cerca de mí") */
   distanciaKm?: number
+  /** Carga la imagen con prioridad (para las primeras tarjetas visibles → mejor LCP) */
+  priority?: boolean
 }
 
 const GRADIENTS = [
@@ -33,7 +35,7 @@ function ClinicPlaceholder({ nombre, ciudad }: { nombre: string; ciudad: string 
   )
 }
 
-export default function ClinicCard({ clinic, distanciaKm }: Props) {
+export default function ClinicCard({ clinic, distanciaKm, priority = false }: Props) {
   const isPremium = clinic.plan === 'Premium'
 
   return (
@@ -52,6 +54,7 @@ export default function ClinicCard({ clinic, distanciaKm }: Props) {
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-300"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            priority={priority}
           />
         ) : (
           <ClinicPlaceholder nombre={clinic.nombre} ciudad={clinic.ciudad} />

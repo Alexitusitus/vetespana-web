@@ -1,39 +1,12 @@
 import { Suspense } from 'react'
 import type { Metadata } from 'next'
-import { getClinics } from '@/lib/airtable'
+import { searchClinics } from '@/lib/search'
 import { CIUDAD_DISPLAY } from '@/types/clinic'
 import ClinicGrid from '@/components/ClinicGrid'
 import FilterBar from '@/components/FilterBar'
 import SearchBar from '@/components/SearchBar'
 
-export const dynamic = 'force-dynamic' // SSR real en cada petición — datos siempre frescos de Airtable
-
-function norm(s: string): string {
-  return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
-}
-
-function levenshtein(a: string, b: string): number {
-  const m = a.length, n = b.length
-  const dp = Array.from({ length: m + 1 }, (_, i) =>
-    Array.from({ length: n + 1 }, (_, j) => (i === 0 ? j : j === 0 ? i : 0))
-  )
-  for (let i = 1; i <= m; i++)
-    for (let j = 1; j <= n; j++)
-      dp[i][j] = a[i - 1] === b[j - 1] ? dp[i - 1][j - 1] : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1])
-  return dp[m][n]
-}
-
-// Devuelve true si el campo contiene la palabra (sin tildes) o si hay una palabra
-// en el campo con distancia de edición ≤ 1 (para palabras > 3 letras)
-function fuzzyField(field: string, word: string): boolean {
-  const f = norm(field)
-  if (f.includes(word)) return true
-  if (word.length > 3) {
-    const tokens = f.split(/[\s,.\-/]+/)
-    return tokens.some(t => Math.abs(t.length - word.length) <= 1 && levenshtein(t, word) <= 1)
-  }
-  return false
-}
+export const dynamic = 'force-dynamic' // depende de los filtros de la URL (searchParams)
 
 interface Props {
   searchParams: Promise<{
@@ -112,34 +85,24 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 export default async function ClinicasPage({ searchParams }: Props) {
   const params = await searchParams
 
-  const clinicas = await getClinics({
+  const filtradas = await searchClinics({
     ciudad: params.ciudad,
     comunidad: params.comunidad,
     especialidad: params.especialidad,
     urgencias: params.urgencias === '1',
+    q: params.q,
+    orden: params.orden,
   })
 
-  // Filtro por búsqueda libre — tolerante a tildes y a 1 typo por palabra
-  const q = params.q?.trim() ?? ''
-  const queryWords = norm(q).split(/\s+/).filter(Boolean)
-  const filtradas = queryWords.length
-    ? clinicas.filter((c) =>
-        queryWords.every((word) =>
-          fuzzyField(c.nombre, word) ||
-          fuzzyField(c.ciudad, word) ||
-          c.especialidades.some((e) => fuzzyField(e, word)) ||
-          fuzzyField(c.direccion ?? '', word) ||
-          fuzzyField(c.descripcion ?? '', word)
-        )
-      )
-    : clinicas
-
-  // Orden
-  if (params.orden === 'nombre') {
-    filtradas.sort((a, b) => a.nombre.localeCompare(b.nombre))
-  } else if (params.orden === 'valoracion') {
-    filtradas.sort((a, b) => (b.valoracionMedia ?? 0) - (a.valoracionMedia ?? 0))
-  }
+  const PAGE = 24
+  // Query string de los filtros (sin offset) para que ClinicGrid pida más a la API.
+  const apiQs = new URLSearchParams()
+  if (params.ciudad) apiQs.set('ciudad', params.ciudad)
+  if (params.comunidad) apiQs.set('comunidad', params.comunidad)
+  if (params.especialidad) apiQs.set('especialidad', params.especialidad)
+  if (params.urgencias === '1') apiQs.set('urgencias', '1')
+  if (params.q) apiQs.set('q', params.q)
+  if (params.orden) apiQs.set('orden', params.orden)
 
   const lugar = params.ciudad ?? params.comunidad ?? 'España'
   // Nombre bonito para mostrar (p.ej. "Logroño" en vez del valor de Airtable "Logrono")
@@ -179,7 +142,9 @@ export default async function ClinicasPage({ searchParams }: Props) {
           descripción larga ni la galería, así que no las mandamos. */}
       {filtradas.length > 0 ? (
         <ClinicGrid
-          clinics={filtradas.map((c) => ({ ...c, descripcion: undefined, galeriaFotos: [] }))}
+          initial={filtradas.slice(0, PAGE)}
+          total={filtradas.length}
+          query={apiQs.toString()}
         />
       ) : (
         <div className="text-center py-20 text-gray-400">

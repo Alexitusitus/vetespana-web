@@ -9,10 +9,23 @@ import {
 import { getClinicBySlug, getReviewsByClinic } from '@/lib/airtable'
 import ReviewForm from '@/components/ReviewForm'
 
-export const dynamic = 'force-dynamic' // SSR real en cada petición — datos siempre frescos de Airtable
+// ISR: cada ficha se renderiza la primera vez que se visita y se cachea en el
+// edge 1h (o hasta el siguiente deploy). Antes con force-dynamic eran ~3s en
+// CADA visita; ahora las visitas siguientes (y el robot de Google) se sirven
+// cacheadas (~100ms). dynamicParams=true (por defecto): las clínicas nuevas se
+// renderizan al vuelo sin necesidad de build.
+export const revalidate = 3600
 
 interface Props {
   params: Promise<{ slug: string }>
+}
+
+// Devolvemos [] a propósito: no pre-generamos ninguna ficha en el build (serían
+// miles), pero esto activa el modo ISR — cada ficha se renderiza al visitarla
+// por primera vez y se cachea en el edge (revalidate arriba). dynamicParams=true
+// (por defecto) permite que cualquier slug nuevo se genere al vuelo.
+export async function generateStaticParams() {
+  return []
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

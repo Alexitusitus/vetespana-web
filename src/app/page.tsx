@@ -6,7 +6,10 @@ import SearchBar from '@/components/SearchBar'
 import SpainMap from '@/components/SpainMap'
 import { ArrowRight, ShieldCheck, Star, Zap } from 'lucide-react'
 
-export const dynamic = 'force-dynamic' // SSR real en cada petición — datos siempre frescos de Airtable
+// ISR: la página se cachea en el edge de Vercel y se regenera cada hora (o en
+// cada deploy). Antes con force-dynamic se re-renderizaba en cada visita (~3s);
+// ahora se sirve cacheada (~100ms). Los datos siguen frescos: 1h o al desplegar.
+export const revalidate = 3600
 
 export default async function HomePage() {
   const clinicas = await getFeaturedClinics()

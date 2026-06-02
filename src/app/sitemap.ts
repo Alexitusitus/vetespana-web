@@ -2,6 +2,8 @@ import type { MetadataRoute } from 'next'
 import { getAllClinicSlugs } from '@/lib/airtable'
 import { CIUDADES_POR_COMUNIDAD } from '@/types/clinic'
 
+// Dinámico: se genera bajo demanda (Google lo pide de vez en cuando). Así no
+// depende de Airtable durante el build. Usa la caché de datos, o sea que es rápido.
 export const dynamic = 'force-dynamic'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

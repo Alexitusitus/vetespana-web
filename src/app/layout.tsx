@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     template: '%s | VetEspaña',
   },
   description:
-    'Encuentra tu veterinario de confianza: más de 1.200 clínicas veterinarias en toda España, con fotos, horarios, especialidades y urgencias 24h. Busca por ciudad.',
+    'Encuentra tu veterinario de confianza: más de 2.400 clínicas veterinarias en toda España, con fotos, horarios, especialidades y urgencias 24h. Busca por ciudad.',
   keywords: [
     'veterinaria',
     'clínica veterinaria',
@@ -33,14 +33,14 @@ export const metadata: Metadata = {
     siteName: 'VetEspaña',
     title: 'VetEspaña — Encuentra tu veterinario de confianza en España',
     description:
-      'Más de 1.200 clínicas veterinarias en toda España. Fotos, horarios, especialidades, urgencias 24h y reseñas reales. Busca veterinario por ciudad.',
+      'Más de 2.400 clínicas veterinarias en toda España. Fotos, horarios, especialidades, urgencias 24h y reseñas reales. Busca veterinario por ciudad.',
     url: 'https://www.vetespana.es',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'VetEspaña — Encuentra tu veterinario de confianza en España',
     description:
-      'Más de 1.200 clínicas veterinarias en toda España. Fotos, horarios, especialidades y urgencias 24h. Busca veterinario por ciudad.',
+      'Más de 2.400 clínicas veterinarias en toda España. Fotos, horarios, especialidades y urgencias 24h. Busca veterinario por ciudad.',
   },
   alternates: {
     canonical: 'https://www.vetespana.es',

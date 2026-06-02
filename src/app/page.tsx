@@ -21,7 +21,7 @@ export default async function HomePage() {
             veterinaria cerca de ti
           </h1>
           <p className="text-teal-100 text-lg mb-8">
-            Más de 1.200 clínicas veterinarias en toda España. Con fotos, horarios, especialidades y reseñas reales.
+            Más de 2.400 clínicas veterinarias en toda España. Con fotos, horarios, especialidades y reseñas reales.
           </p>
 
           <div className="bg-white rounded-2xl p-3 shadow-2xl">

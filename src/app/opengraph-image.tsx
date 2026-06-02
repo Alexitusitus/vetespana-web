@@ -51,7 +51,7 @@ export default function OpengraphImage() {
             borderRadius: 999,
           }}
         >
-          +1.200 clínicas · fotos, horarios, especialidades y urgencias 24h
+          +2.400 clínicas · fotos, horarios, especialidades y urgencias 24h
         </div>
       </div>
     ),

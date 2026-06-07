@@ -95,9 +95,10 @@ async function airtableAll(): Promise<any[]> {
 }
 
 export async function GET(req: NextRequest) {
-  // Seguridad: solo Vercel Cron (envía Authorization: Bearer CRON_SECRET)
+  // Seguridad opcional: si existe CRON_SECRET, exige la cabecera (Vercel Cron la
+  // envía sola). Si no se ha configurado, funciona igualmente (sin barrera).
   const secret = process.env.CRON_SECRET
-  if (!secret || req.headers.get('authorization') !== `Bearer ${secret}`) {
+  if (secret && req.headers.get('authorization') !== `Bearer ${secret}`) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
   }
   if (!AKEY) return NextResponse.json({ error: 'Sin AIRTABLE_API_KEY' }, { status: 500 })

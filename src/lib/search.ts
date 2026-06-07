@@ -62,10 +62,22 @@ export async function searchClinics(params: SearchParams): Promise<Clinic[]> {
       )
     : clinicas
 
+  // Criterio base: Premium > Verificada > (criterio elegido)
+  // Las verificadas salen SIEMPRE por delante, sea cual sea el orden seleccionado.
+  const basePriority = (a: Clinic, b: Clinic): number => {
+    if (a.plan !== b.plan) return a.plan === 'Premium' ? -1 : 1
+    if (a.verificada !== b.verificada) return a.verificada ? -1 : 1
+    return 0
+  }
+
   if (params.orden === 'nombre') {
-    filtradas = [...filtradas].sort((a, b) => a.nombre.localeCompare(b.nombre))
+    filtradas = [...filtradas].sort((a, b) => basePriority(a, b) || a.nombre.localeCompare(b.nombre))
   } else if (params.orden === 'valoracion') {
-    filtradas = [...filtradas].sort((a, b) => (b.valoracionMedia ?? 0) - (a.valoracionMedia ?? 0))
+    filtradas = [...filtradas].sort((a, b) => basePriority(a, b) || (b.valoracionMedia ?? 0) - (a.valoracionMedia ?? 0))
+  } else {
+    // Orden por defecto (relevancia): viene de Airtable ya ordenado por Plan > Verificada > Valoración,
+    // pero re-aplicamos aquí por si el caché llegó en otro orden.
+    filtradas = [...filtradas].sort((a, b) => basePriority(a, b) || (b.valoracionMedia ?? 0) - (a.valoracionMedia ?? 0))
   }
 
   return filtradas

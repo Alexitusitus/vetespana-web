@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import { getClinicBySlug, getReviewsByClinic } from '@/lib/airtable'
 import ReviewForm from '@/components/ReviewForm'
+import BadgeBox from '@/components/BadgeBox'
 
 // ISR: cada ficha se renderiza la primera vez que se visita y se cachea en el
 // edge 1h (o hasta el siguiente deploy). Antes con force-dynamic eran ~3s en
@@ -309,6 +310,9 @@ export default async function ClinicaPage({ params }: Props) {
 
               <ReviewForm clinicId={clinic.id} clinicNombre={clinic.nombre} />
             </div>
+
+            {/* Sello para que la clínica lo ponga en su web → backlink hacia su ficha */}
+            <BadgeBox slug={clinic.slug} nombre={clinic.nombre} />
           </div>
 
           {/* Columna lateral — datos de contacto.

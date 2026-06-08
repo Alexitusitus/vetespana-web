@@ -7,6 +7,7 @@ import {
   Star, Zap, ArrowLeft, MessageCircle, Share2
 } from 'lucide-react'
 import { getClinicBySlug, getReviewsByClinic } from '@/lib/airtable'
+import { GUIAS } from '@/data/guias'
 import ReviewForm from '@/components/ReviewForm'
 import BadgeBox from '@/components/BadgeBox'
 
@@ -107,6 +108,16 @@ export default async function ClinicaPage({ params }: Props) {
   if (!clinic) notFound()
 
   const reviews = await getReviewsByClinic(clinic.id)
+
+  // Guías relevantes para enlazar desde la ficha (urgencias primero si las tiene)
+  const slugsGuias = (
+    clinic.urgencias24h
+      ? ['urgencias-veterinarias-24h', 'como-elegir-clinica-veterinaria', 'calendario-vacunas-perros-gatos', 'cuanto-cuesta-veterinario']
+      : ['como-elegir-clinica-veterinaria', 'calendario-vacunas-perros-gatos', 'cuanto-cuesta-veterinario', 'alimentos-prohibidos-perros-gatos']
+  )
+  const guiasFicha = slugsGuias
+    .map((s) => GUIAS.find((g) => g.slug === s))
+    .filter((g): g is (typeof GUIAS)[number] => Boolean(g))
 
   const isPremium = clinic.plan === 'Premium'
   const whatsappNumero = (clinic.whatsapp ?? clinic.telefono ?? '').replace(/\D/g, '')
@@ -313,6 +324,23 @@ export default async function ClinicaPage({ params }: Props) {
 
             {/* Sello para que la clínica lo ponga en su web → backlink hacia su ficha */}
             <BadgeBox slug={clinic.slug} nombre={clinic.nombre} />
+
+            {/* Guías útiles — enlaces internos hacia el contenido */}
+            <div className="bg-white rounded-2xl border border-gray-200 p-5">
+              <h2 className="font-bold text-gray-900 mb-3">Guías para cuidar de tu mascota</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {guiasFicha.map((g) => (
+                  <Link
+                    key={g.slug}
+                    href={`/guias/${g.slug}`}
+                    className="flex items-center gap-2.5 rounded-xl p-2.5 hover:bg-teal-50 transition-colors"
+                  >
+                    <span className="text-xl shrink-0">{g.emoji}</span>
+                    <span className="text-sm font-medium text-gray-700 leading-snug">{g.titulo}</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* Columna lateral — datos de contacto.

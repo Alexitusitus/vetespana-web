@@ -4,6 +4,7 @@ import { getFeaturedClinics } from '@/lib/airtable'
 import ClinicCard from '@/components/ClinicCard'
 import SearchBar from '@/components/SearchBar'
 import SpainMap from '@/components/SpainMap'
+import { GUIAS } from '@/data/guias'
 import { ArrowRight, ShieldCheck, Star, Zap } from 'lucide-react'
 
 // ISR: la página se cachea en el edge de Vercel y se regenera cada hora (o en
@@ -90,6 +91,34 @@ export default async function HomePage() {
             <p>Pronto habrá clínicas disponibles. ¡Estamos creciendo!</p>
           </div>
         )}
+      </section>
+
+      {/* Guías para dueños de mascotas */}
+      <section className="max-w-6xl mx-auto px-4 pb-12">
+        <div className="flex items-end justify-between mb-6">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">Guías para cuidar de tu mascota</h2>
+            <p className="text-sm text-gray-500 mt-1">Consejos prácticos sobre salud, urgencias, vacunas y más.</p>
+          </div>
+          <Link
+            href="/guias"
+            className="text-teal-700 font-medium text-sm flex items-center gap-1 hover:gap-2 transition-all shrink-0"
+          >
+            Ver todas <ArrowRight size={15} />
+          </Link>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          {GUIAS.map((g) => (
+            <Link
+              key={g.slug}
+              href={`/guias/${g.slug}`}
+              className="flex items-center gap-3 bg-white rounded-xl p-4 border border-gray-200 hover:border-teal-300 hover:shadow-md transition-all"
+            >
+              <span className="text-2xl shrink-0">{g.emoji}</span>
+              <span className="font-semibold text-sm text-gray-800 leading-snug">{g.titulo}</span>
+            </Link>
+          ))}
+        </div>
       </section>
 
       {/* Por qué confiar */}

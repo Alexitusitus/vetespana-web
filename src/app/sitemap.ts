@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { getAllClinicSlugs } from '@/lib/airtable'
 import { CIUDADES_POR_COMUNIDAD } from '@/types/clinic'
+import { GUIAS } from '@/data/guias'
 
 // Dinámico: se genera bajo demanda (Google lo pide de vez en cuando). Así no
 // depende de Airtable durante el build. Usa la caché de datos, o sea que es rápido.
@@ -15,7 +16,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/clinicas`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
     { url: `${baseUrl}/cerca-de-mi`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.7 },
     { url: `${baseUrl}/alta-clinica`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.5 },
+    { url: `${baseUrl}/guias`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.6 },
   ]
+
+  // Guías informacionales (contenido SEO que atrae tráfico de búsquedas)
+  const guiaPages: MetadataRoute.Sitemap = GUIAS.map((g) => ({
+    url: `${baseUrl}/guias/${g.slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'monthly' as const,
+    priority: 0.6,
+  }))
 
   // Una URL por comunidad autónoma — valor semántico alto, poca duplicación
   const comunidadPages: MetadataRoute.Sitemap = Object.keys(CIUDADES_POR_COMUNIDAD).map((comunidad) => ({
@@ -48,5 +58,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // NOTA: Las URLs ?especialidad= y las combinaciones de filtros se excluyen a propósito
   // (contenido solapado que gasta presupuesto de rastreo). Google las descubrirá por los
   // enlaces internos. Sí incluimos ?ciudad= porque son páginas locales de alto valor SEO.
-  return [...staticPages, ...comunidadPages, ...ciudadPages, ...clinicPages]
+  return [...staticPages, ...guiaPages, ...comunidadPages, ...ciudadPages, ...clinicPages]
 }

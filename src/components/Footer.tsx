@@ -36,6 +36,7 @@ export default function Footer() {
               <li><Link href="/clinicas" className="hover:text-white transition-colors">Buscar clínicas veterinarias</Link></li>
               <li><Link href="/cerca-de-mi" className="hover:text-white transition-colors">Veterinario cerca de mí</Link></li>
               <li><Link href="/clinicas?urgencias=1" className="hover:text-white transition-colors">Veterinarios urgencias 24h</Link></li>
+              <li><Link href="/guias" className="hover:text-white transition-colors">Guías para dueños de mascotas</Link></li>
             </ul>
           </div>
 

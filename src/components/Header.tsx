@@ -17,6 +17,9 @@ export default function Header() {
           <Link href="/cerca-de-mi" className="flex items-center gap-1 hover:text-teal-600 transition-colors">
             <Navigation size={15} className="fill-current" /> Cerca de mí
           </Link>
+          <Link href="/guias" className="hover:text-teal-600 transition-colors">
+            Guías
+          </Link>
           <Link
             href="/alta-clinica"
             className="bg-teal-700 text-white px-4 py-2 rounded-full hover:bg-teal-800 transition-colors"

@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import React from 'react'
 import { GUIAS, getGuia } from '@/data/guias'
+import GuiaHero from '@/components/GuiaHero'
 
 const BASE = 'https://www.vetespana.es'
 
@@ -100,11 +101,12 @@ export default async function GuiaPage({ params }: { params: Promise<{ slug: str
         <span className="text-gray-700">{guia.titulo}</span>
       </nav>
 
-      <div className="text-4xl mb-3">{guia.emoji}</div>
-      <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">{guia.titulo}</h1>
-      <p className="text-gray-500 text-sm mb-6">
-        Actualizado en {guia.actualizadoTexto} · {guia.lectura} de lectura
-      </p>
+      <GuiaHero
+        emoji={guia.emoji}
+        titulo={guia.titulo}
+        meta={`Actualizado en ${guia.actualizadoTexto} · ${guia.lectura} de lectura`}
+        patternId={`paws-${guia.slug}`}
+      />
       <p className="text-lg text-gray-700 mb-8 leading-relaxed">{guia.resumen}</p>
 
       {guia.secciones.map((sec, i) => (

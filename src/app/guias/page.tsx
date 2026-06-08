@@ -32,12 +32,16 @@ export default function GuiasPage() {
           <Link
             key={g.slug}
             href={`/guias/${g.slug}`}
-            className="block bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md hover:border-teal-200 transition-all"
+            className="block bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md hover:border-teal-200 transition-all"
           >
-            <div className="text-3xl mb-3">{g.emoji}</div>
-            <h2 className="text-lg font-bold text-gray-900 mb-2">{g.titulo}</h2>
-            <p className="text-sm text-gray-600 mb-3">{g.resumen}</p>
-            <span className="text-sm font-semibold text-teal-700">Leer guía →</span>
+            <div className="bg-gradient-to-br from-teal-500 to-teal-700 h-28 flex items-center justify-center">
+              <span className="text-5xl">{g.emoji}</span>
+            </div>
+            <div className="p-6">
+              <h2 className="text-lg font-bold text-gray-900 mb-2">{g.titulo}</h2>
+              <p className="text-sm text-gray-600 mb-3">{g.resumen}</p>
+              <span className="text-sm font-semibold text-teal-700">Leer guía →</span>
+            </div>
           </Link>
         ))}
       </div>

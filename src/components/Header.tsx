@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { PawPrint, Navigation } from 'lucide-react'
+import MobileMenu from './MobileMenu'
 
 export default function Header() {
   return (
@@ -29,16 +30,14 @@ export default function Header() {
         </nav>
 
         {/* Mobile */}
-        <div className="flex items-center gap-3 md:hidden">
-          <Link href="/cerca-de-mi" aria-label="Veterinarias cerca de mí" className="flex items-center gap-1 text-sm font-medium text-teal-700">
-            <Navigation size={16} className="fill-current" /> Cerca
-          </Link>
+        <div className="flex items-center gap-2 md:hidden">
           <Link
             href="/alta-clinica"
             className="bg-teal-700 text-white px-3 py-1.5 rounded-full text-sm font-medium"
           >
             Añade tu clínica
           </Link>
+          <MobileMenu />
         </div>
       </div>
     </header>

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import Image from 'next/image'
 import { GUIAS } from '@/data/guias'
 
 export const metadata: Metadata = {
@@ -34,8 +35,16 @@ export default function GuiasPage() {
             href={`/guias/${g.slug}`}
             className="block bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md hover:border-teal-200 transition-all"
           >
-            <div className="bg-gradient-to-br from-teal-500 to-teal-700 h-28 flex items-center justify-center">
-              <span className="text-5xl">{g.emoji}</span>
+            <div className="relative h-40">
+              <Image
+                src={g.heroImg}
+                alt={g.heroAlt}
+                fill
+                sizes="(max-width: 640px) 100vw, 50vw"
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+              <span className="absolute bottom-2 left-3 text-3xl drop-shadow-md">{g.emoji}</span>
             </div>
             <div className="p-6">
               <h2 className="text-lg font-bold text-gray-900 mb-2">{g.titulo}</h2>

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import React from 'react'
 import { GUIAS, getGuia } from '@/data/guias'
@@ -102,29 +103,45 @@ export default async function GuiaPage({ params }: { params: Promise<{ slug: str
       </nav>
 
       <GuiaHero
+        img={guia.heroImg}
+        alt={guia.heroAlt}
         emoji={guia.emoji}
         titulo={guia.titulo}
         meta={`Actualizado en ${guia.actualizadoTexto} · ${guia.lectura} de lectura`}
-        patternId={`paws-${guia.slug}`}
       />
       <p className="text-lg text-gray-700 mb-8 leading-relaxed">{guia.resumen}</p>
 
       {guia.secciones.map((sec, i) => (
-        <section key={i} className="mb-8">
-          <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-3">{sec.h}</h2>
-          {sec.parrafos.map((p, j) => (
-            <p key={j} className="text-gray-700 leading-relaxed mb-3">
-              {renderParrafo(p)}
-            </p>
-          ))}
-          {sec.lista && (
-            <ul className="list-disc pl-5 space-y-2 text-gray-700 mt-2">
-              {sec.lista.map((li, k) => (
-                <li key={k}>{li}</li>
-              ))}
-            </ul>
+        <React.Fragment key={i}>
+          <section className="mb-8">
+            <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-3">{sec.h}</h2>
+            {sec.parrafos.map((p, j) => (
+              <p key={j} className="text-gray-700 leading-relaxed mb-3">
+                {renderParrafo(p)}
+              </p>
+            ))}
+            {sec.lista && (
+              <ul className="list-disc pl-5 space-y-2 text-gray-700 mt-2">
+                {sec.lista.map((li, k) => (
+                  <li key={k}>{li}</li>
+                ))}
+              </ul>
+            )}
+          </section>
+          {i === guia.inlineAfter && (
+            <figure className="my-9">
+              <Image
+                src={guia.inlineImg}
+                alt={guia.inlineAlt}
+                width={1100}
+                height={620}
+                sizes="(max-width: 768px) 100vw, 768px"
+                className="rounded-2xl w-full h-auto"
+              />
+              <figcaption className="text-xs text-gray-400 mt-2 text-center">{guia.inlineCaption}</figcaption>
+            </figure>
           )}
-        </section>
+        </React.Fragment>
       ))}
 
       {/* CTA al directorio */}

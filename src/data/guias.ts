@@ -20,6 +20,12 @@ export interface Guia {
   actualizado: string // ISO
   actualizadoTexto: string
   lectura: string // tiempo de lectura
+  heroImg: string // foto de cabecera
+  heroAlt: string
+  inlineImg: string // foto dentro del contenido
+  inlineAlt: string
+  inlineCaption: string
+  inlineAfter: number // se inserta tras esta sección (índice)
   secciones: Seccion[]
   faq: { q: string; a: string }[]
 }
@@ -37,6 +43,12 @@ export const GUIAS: Guia[] = [
     actualizado: '2026-06-08',
     actualizadoTexto: 'junio de 2026',
     lectura: '5 min',
+    heroImg: '/images/guias/g1-hero.jpg',
+    heroAlt: 'Veterinario y dueña atienden a un perro pequeño en la consulta',
+    inlineImg: '/images/guias/g1-inline.jpg',
+    inlineAlt: 'Veterinario sostiene a un perro pequeño con el fonendoscopio',
+    inlineCaption: 'Una buena clínica dedica tiempo a tu mascota y te explica todo con calma.',
+    inlineAfter: 1,
     secciones: [
       {
         h: 'No elijas solo por cercanía',
@@ -113,6 +125,12 @@ export const GUIAS: Guia[] = [
     actualizado: '2026-06-08',
     actualizadoTexto: 'junio de 2026',
     lectura: '6 min',
+    heroImg: '/images/guias/g2-hero.jpg',
+    heroAlt: 'Veterinario examina a un pastor alemán tumbado en la clínica',
+    inlineImg: '/images/guias/g2-inline.jpg',
+    inlineAlt: 'Veterinario con mascarilla y guantes revisa a un perro',
+    inlineCaption: 'Ante una urgencia, llama a la clínica antes de salir: ganarás minutos clave.',
+    inlineAfter: 1,
     secciones: [
       {
         h: 'Señales de alarma: cuándo es una urgencia',
@@ -182,6 +200,12 @@ export const GUIAS: Guia[] = [
     actualizado: '2026-06-08',
     actualizadoTexto: 'junio de 2026',
     lectura: '6 min',
+    heroImg: '/images/guias/g3-hero.jpg',
+    heroAlt: 'Veterinario sujeta con cuidado a un gato sobre la mesa de exploración',
+    inlineImg: '/images/guias/g3-inline.jpg',
+    inlineAlt: 'Vacunación de un gato en la clínica veterinaria',
+    inlineCaption: 'Las vacunas preparan el sistema inmunitario frente a enfermedades graves.',
+    inlineAfter: 1,
     secciones: [
       {
         h: 'Por qué son importantes las vacunas',
@@ -246,6 +270,12 @@ export const GUIAS: Guia[] = [
     actualizado: '2026-06-08',
     actualizadoTexto: 'junio de 2026',
     lectura: '5 min',
+    heroImg: '/images/guias/g4-hero.jpg',
+    heroAlt: 'Veterinario examina a un perro pequeño con el fonendoscopio',
+    inlineImg: '/images/guias/g4-inline.jpg',
+    inlineAlt: 'Gato atendido con cuidado sobre la mesa de la clínica veterinaria',
+    inlineCaption: 'La prevención —vacunas y revisiones— evita tratamientos más caros después.',
+    inlineAfter: 1,
     secciones: [
       {
         h: 'Por qué varían tanto los precios',

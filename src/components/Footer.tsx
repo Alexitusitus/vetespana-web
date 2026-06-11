@@ -61,6 +61,9 @@ export default function Footer() {
                 Veterinarios en {CIUDAD_DISPLAY[ciudad] ?? ciudad}
               </Link>
             ))}
+            <Link href="/ciudades" className="text-teal-400 hover:text-teal-300 font-medium transition-colors">
+              Ver todas las ciudades →
+            </Link>
           </div>
         </div>
 

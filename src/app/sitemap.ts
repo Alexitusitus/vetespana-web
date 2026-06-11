@@ -24,6 +24,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/cerca-de-mi`, lastModified: CONTENIDO_ACTUALIZADO, changeFrequency: 'weekly', priority: 0.7 },
     { url: `${baseUrl}/alta-clinica`, lastModified: CONTENIDO_ACTUALIZADO, changeFrequency: 'monthly', priority: 0.5 },
     { url: `${baseUrl}/guias`, lastModified: CONTENIDO_ACTUALIZADO, changeFrequency: 'weekly', priority: 0.6 },
+    { url: `${baseUrl}/ciudades`, lastModified: CONTENIDO_ACTUALIZADO, changeFrequency: 'weekly', priority: 0.7 },
   ]
 
   // Guías informacionales — cada una con su fecha real de actualización (precisa)

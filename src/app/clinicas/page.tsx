@@ -48,23 +48,37 @@ function textoSeoLugar(lugar: string, count: number, especialidad?: string): str
 
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const params = await searchParams
-  const parts: string[] = []
-  if (params.comunidad) parts.push(`en ${params.comunidad}`)
-  else if (params.ciudad) parts.push(`en ${params.ciudad}`)
-  if (params.especialidad) parts.push(params.especialidad.toLowerCase())
-  if (params.urgencias === '1') parts.push('urgencias 24h')
 
-  const title = parts.length
-    ? `Clínicas veterinarias ${parts.join(' · ')}`
-    : 'Todas las clínicas veterinarias en España'
+  // Nombre bonito (con tildes / nombre completo) para títulos y descripciones.
+  // OJO: antes se usaba el valor crudo de Airtable → salía "Logrono" o "Las Palmas".
+  const ciudadDisplay = params.ciudad ? CIUDAD_DISPLAY[params.ciudad] ?? params.ciudad : undefined
+  const lugarDisplay = params.comunidad ?? ciudadDisplay ?? 'España'
 
-  const lugar = params.comunidad ?? params.ciudad ?? 'España'
+  let title: string
+  let description: string
 
-  // Descripción única por filtro activo
-  let description = `Directorio de clínicas veterinarias en ${lugar}.`
-  if (params.especialidad) description += ` Especialistas en ${params.especialidad.toLowerCase()} para perros, gatos y mascotas.`
-  if (params.urgencias === '1') description += ` Clínicas con urgencias 24 horas disponibles.`
-  description += ` Consulta teléfono, horario y dirección.`
+  // Página de ciudad "limpia" (sin especialidad ni urgencias): la orientamos a la
+  // búsqueda real "veterinarios en {ciudad}" e incluimos el nº de clínicas (mejora CTR).
+  if (ciudadDisplay && !params.especialidad && !params.urgencias) {
+    const n = (await searchClinics({ ciudad: params.ciudad })).length
+    title = `Veterinarios en ${ciudadDisplay}${n ? `: ${n} clínicas veterinarias` : ''}`
+    description = `${n || 'Las mejores'} clínicas veterinarias en ${ciudadDisplay}: veterinario cercano, urgencias 24h, especialidades, horarios, teléfono y reseñas. Encuentra tu clínica de confianza.`
+  } else {
+    const parts: string[] = []
+    if (params.comunidad) parts.push(`en ${params.comunidad}`)
+    else if (ciudadDisplay) parts.push(`en ${ciudadDisplay}`)
+    if (params.especialidad) parts.push(params.especialidad.toLowerCase())
+    if (params.urgencias === '1') parts.push('urgencias 24h')
+
+    title = parts.length
+      ? `Clínicas veterinarias ${parts.join(' · ')}`
+      : 'Todas las clínicas veterinarias en España'
+
+    description = `Directorio de clínicas veterinarias en ${lugarDisplay}.`
+    if (params.especialidad) description += ` Especialistas en ${params.especialidad.toLowerCase()} para perros, gatos y mascotas.`
+    if (params.urgencias === '1') description += ` Clínicas con urgencias 24 horas disponibles.`
+    description += ` Consulta teléfono, horario y dirección.`
+  }
 
   // Canónica: si hay filtros combinados, apunta a la URL más simple para evitar duplicados
   const baseUrl = 'https://www.vetespana.es'
@@ -107,13 +121,55 @@ export default async function ClinicasPage({ searchParams }: Props) {
   const lugar = params.ciudad ?? params.comunidad ?? 'España'
   // Nombre bonito para mostrar (p.ej. "Logroño" en vez del valor de Airtable "Logrono")
   const lugarDisplay = params.ciudad ? CIUDAD_DISPLAY[params.ciudad] ?? params.ciudad : lugar
-  const tituloH1 = [
-    'Clínicas veterinarias',
-    params.especialidad ? `· ${params.especialidad}` : '',
-    `en ${lugarDisplay}`,
-  ]
-    .filter(Boolean)
-    .join(' ')
+
+  // En la página de ciudad "limpia" el H1 ataca la búsqueda real "veterinarios en {ciudad}".
+  const esCiudadLimpia = !!params.ciudad && !params.especialidad
+  const tituloH1 = esCiudadLimpia
+    ? `Veterinarios en ${lugarDisplay}`
+    : ['Clínicas veterinarias', params.especialidad ? `· ${params.especialidad}` : '', `en ${lugarDisplay}`]
+        .filter(Boolean)
+        .join(' ')
+
+  // ── Datos reales para enriquecer el contenido de la página de ciudad/comunidad ──
+  const count24h = filtradas.filter((c) => c.urgencias24h).length
+  // Especialidades más frecuentes (excluyendo las dos base Perros/Gatos para que aporte)
+  const espCount = new Map<string, number>()
+  for (const c of filtradas) {
+    for (const e of c.especialidades) {
+      if (e === 'Perros' || e === 'Gatos') continue
+      espCount.set(e, (espCount.get(e) ?? 0) + 1)
+    }
+  }
+  const topEsp = [...espCount.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([e]) => e)
+
+  // FAQ con datos reales (también se emite como JSON-LD FAQPage abajo)
+  const faq =
+    params.ciudad || params.comunidad
+      ? [
+          {
+            q: `¿Cuántas clínicas veterinarias hay en ${lugarDisplay}?`,
+            a: `En VetEspaña tenemos ${filtradas.length} clínicas veterinarias en ${lugarDisplay} con su teléfono, dirección, horario y especialidades.`,
+          },
+          {
+            q: `¿Hay veterinarios de urgencias 24h en ${lugarDisplay}?`,
+            a:
+              count24h > 0
+                ? `Sí. En ${lugarDisplay} hay ${count24h} clínica${count24h !== 1 ? 's' : ''} veterinaria${count24h !== 1 ? 's' : ''} con urgencias 24 horas. Usa el filtro "Solo con urgencias 24h" para verlas.`
+                : `De momento no tenemos listada ninguna clínica con urgencias 24h en ${lugarDisplay}. Puedes consultar las clínicas cercanas o las de tu comunidad.`,
+          },
+          ...(topEsp.length
+            ? [
+                {
+                  q: `¿Qué especialidades veterinarias puedo encontrar en ${lugarDisplay}?`,
+                  a: `Las clínicas de ${lugarDisplay} ofrecen especialidades como ${topEsp.join(', ')}, además de atención general para perros y gatos.`,
+                },
+              ]
+            : []),
+        ]
+      : []
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
@@ -133,7 +189,7 @@ export default async function ClinicasPage({ searchParams }: Props) {
 
       {/* Título SEO */}
       <div className="flex items-baseline justify-between mb-5">
-        <h1 className="text-xl font-bold text-gray-900">{tituloH1}</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{tituloH1}</h1>
         <span className="text-sm text-gray-500">{filtradas.length} resultado{filtradas.length !== 1 ? 's' : ''}</span>
       </div>
 
@@ -163,7 +219,55 @@ export default async function ClinicasPage({ searchParams }: Props) {
           {textoSeoLugar(lugarDisplay, filtradas.length, params.especialidad).map((p, i) => (
             <p key={i}>{p}</p>
           ))}
+
+          {/* Datos reales de la zona (contenido único que ayuda a posicionar) */}
+          {filtradas.length > 0 && (
+            <p>
+              De las <strong>{filtradas.length}</strong> clínicas veterinarias en {lugarDisplay},{' '}
+              {count24h > 0 ? (
+                <>
+                  <strong>{count24h}</strong> ofrece{count24h !== 1 ? 'n' : ''} urgencias 24 horas.
+                </>
+              ) : (
+                <>aún no tenemos ninguna con urgencias 24h listada.</>
+              )}
+              {topEsp.length > 0 && <> Especialidades destacadas en la zona: {topEsp.join(', ')}.</>}
+            </p>
+          )}
+
+          {/* FAQ con datos reales — útil para el usuario y para Google */}
+          {faq.length > 0 && (
+            <div className="pt-4 space-y-4">
+              <h2 className="text-base font-semibold text-gray-700">
+                Preguntas frecuentes sobre veterinarios en {lugarDisplay}
+              </h2>
+              {faq.map((item, i) => (
+                <div key={i}>
+                  <h3 className="font-medium text-gray-700">{item.q}</h3>
+                  <p>{item.a}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
+      )}
+
+      {/* Datos estructurados FAQPage (los mismos textos visibles de arriba) */}
+      {faq.length > 0 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'FAQPage',
+              mainEntity: faq.map((item) => ({
+                '@type': 'Question',
+                name: item.q,
+                acceptedAnswer: { '@type': 'Answer', text: item.a },
+              })),
+            }),
+          }}
+        />
       )}
     </div>
   )

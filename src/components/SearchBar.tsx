@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Search } from 'lucide-react'
 import CitySelect from './CitySelect'
+import { ciudadSlug } from '@/lib/ciudad-slug'
 
 interface Props {
   initialCiudad?: string
@@ -17,6 +18,11 @@ export default function SearchBar({ initialCiudad = '', initialQuery = '' }: Pro
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault()
+    // Solo ciudad (sin texto libre) → URL limpia de ciudad directamente.
+    if (ciudad && !query) {
+      router.push(`/veterinarios/${ciudadSlug(ciudad)}`)
+      return
+    }
     const params = new URLSearchParams()
     if (ciudad) params.set('ciudad', ciudad)
     if (query) params.set('q', query)

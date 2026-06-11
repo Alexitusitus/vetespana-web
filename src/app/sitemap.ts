@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { getAllClinicSlugs } from '@/lib/airtable'
 import { CIUDADES_POR_COMUNIDAD } from '@/types/clinic'
+import { ciudadSlug } from '@/lib/ciudad-slug'
 import { GUIAS } from '@/data/guias'
 
 // Dinámico: se genera bajo demanda (Google lo pide de vez en cuando). Así no
@@ -44,11 +45,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }))
 
   // Una URL por ciudad — el mayor activo de SEO local ("veterinario en {ciudad}").
-  // Cada una tiene H1, título, descripción y canonical propios (no duplican).
+  // URL limpia /veterinarios/{slug} (antes ?ciudad=). Cada una tiene H1, título,
+  // descripción y canonical propios (no duplican).
   const ciudadPages: MetadataRoute.Sitemap = Object.values(CIUDADES_POR_COMUNIDAD)
     .flat()
     .map((ciudad) => ({
-      url: `${baseUrl}/clinicas?ciudad=${encodeURIComponent(ciudad)}`,
+      url: `${baseUrl}/veterinarios/${ciudadSlug(ciudad)}`,
       lastModified: CONTENIDO_ACTUALIZADO,
       changeFrequency: 'weekly' as const,
       priority: 0.7,

@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { PawPrint } from 'lucide-react'
 import { COMUNIDADES, CIUDADES_POR_COMUNIDAD, CIUDAD_DISPLAY } from '@/types/clinic'
+import { ciudadSlug } from '@/lib/ciudad-slug'
 
 // Lista plana de todas las ciudades válidas (para no enlazar a páginas vacías)
 const TODAS_CIUDADES = new Set(Object.values(CIUDADES_POR_COMUNIDAD).flat())
@@ -55,7 +56,7 @@ export default function Footer() {
             {CIUDADES_DESTACADAS.map((ciudad) => (
               <Link
                 key={ciudad}
-                href={`/clinicas?ciudad=${encodeURIComponent(ciudad)}`}
+                href={`/veterinarios/${ciudadSlug(ciudad)}`}
                 className="hover:text-white transition-colors"
               >
                 Veterinarios en {CIUDAD_DISPLAY[ciudad] ?? ciudad}

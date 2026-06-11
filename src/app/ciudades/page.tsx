@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { CIUDADES_POR_COMUNIDAD, CIUDAD_DISPLAY, COMUNIDAD_EMOJI } from '@/types/clinic'
+import { ciudadSlug } from '@/lib/ciudad-slug'
 
 // Página estática (no lee Airtable): índice navegable de todas las ciudades.
 // Reparte enlaces internos a las 368 páginas de ciudad → mejora rastreo e indexación.
@@ -45,7 +46,7 @@ export default function CiudadesPage() {
                 {ciudades.map((ciudad) => (
                   <Link
                     key={ciudad}
-                    href={`/clinicas?ciudad=${encodeURIComponent(ciudad)}`}
+                    href={`/veterinarios/${ciudadSlug(ciudad)}`}
                     className="text-sm text-gray-600 hover:text-teal-600 hover:underline"
                   >
                     Veterinarios en {CIUDAD_DISPLAY[ciudad] ?? ciudad}

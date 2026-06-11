@@ -87,7 +87,9 @@ export default function CitySelect({ value, onChange, placeholder = 'Todas las c
         onChange={(e) => { setQuery(e.target.value); setOpen(true) }}
         onFocus={() => { setQuery(''); setOpen(true) }}
         onKeyDown={onKeyDown}
-        className="w-full pl-9 pr-9 py-3 rounded-xl border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-400 cursor-text"
+        className={`w-full pl-9 py-3 rounded-xl border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-400 cursor-text ${
+          value && !open ? 'pr-9' : 'pr-3'
+        }`}
       />
       {value && !open && (
         <button
